@@ -93,38 +93,26 @@ server <- function(input, output, session) {
     +input$Select_plot(data = df, mapping = aes(x = input$aes_x, y = input$aes_y))
   })
   
-  sel <- "" 
-  
-  histFunc <- function(pltnm){
-    sel <- pltnm
-    #return (pltnm)
-  }
-  
-# change the plot
-  chplt <- reactive({
-    select_plot <- switch (input$select_plot,
-                           geom_histogram = histFunc("hist"),
-                           geom_density = histFunc("density"),
-                           geom_boxplot = histFunc("box"),
-                           geom_violin = histFunc("vio"),
-                           geom_point = histFunc("sctr"))
-  })
-  
+  sel = ''
+  # Button Actions
   observeEvent( input$goButton, {
-    print("Cliked")
+    #print("Cliked")
     print(input$select_plot)
-  }
+    sel = input$select_plot
     
-  )
- 
-  output$plot <- renderPlot({
-    select = sel
-    
-    if (select == "hist"){
-      print("Hist Pick")
-    }
+    output$plot <- renderPlot({
+      select = sel
+      
+      if (select == "geom_histogram"){
+        print("Hist Pick")
+        hist(df[1])
+      }
+      
+    })
     
   })
+ 
+  
   
   #output$summary <- renderPrint({
     #datasetA <- get(input$datasetA, "package:datasets")
