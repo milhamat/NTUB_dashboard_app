@@ -25,3 +25,7 @@ hist(data[colname])
 dat <- data.frame()
 dat <- data
       
+
+v <- ggplot(data, aes(x=SepalLengthCm, y=SepalWidthCm)) +
+  geom_violin()
+v

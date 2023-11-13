@@ -126,28 +126,33 @@ server <- shinyServer(function(input, output, session) {
     # hist(x, breaks = bins, col = 'darkgray', border = 'white')
     
     
-    # I Since you have two inputs I decided to make a scatterplot
-    x <- data()[, c(input$xcol, input$ycol)]
+    ## I Since you have two inputs I decided to make a scatterplot
+    ## the dataset
+    dat <- data()[, c(input$xcol, input$ycol)]
     
     if (input$select_plot=="geom_point"){
-      plot(x)
+      #plot(dat)
+      ggplot(data(), aes(x=input$xcol, y=input$ycol)) +
+        geom_point()
     }
     if (input$select_plot=="geom_histogram"){
-      x <- data()[, c(input$xcol)]
-      hist(x)
+      #hist(dat)
+      ggplot(data(), aes(input$xcol)) +
+        geom_histogram()
     }
     if (input$select_plot=="geom_boxplot"){
-      x <- data()[, c(input$xcol)]
-      boxplot(x)
+      #boxplot(dat)
+      ggplot(data(), aes(x=input$xcol, y=input$ycol)) +
+        geom_boxplot()
     }
     if (input$select_plot=="geom_density"){
-      x <- data()[, c(input$xcol)]
-      density(x)
+      ggplot(data(), aes(x=input$xcol)) +
+        geom_density()
     }
     if (input$select_plot=="geom_violin"){
-      
-    }
-    
+      ggplot(data(), aes(x=input$xcol, y=input$ycol)) +
+        geom_violin()
+    } 
   })
 })
 
