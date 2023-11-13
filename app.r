@@ -2,16 +2,23 @@ library(shiny)
 
 # The UI
 ui <- fluidPage(
+  fluidRow(titlePanel("國立台北商業大學 校務永續發展中心")),
+  fluidRow(img(src="campus_logo.png", height=75, width=180)),
   
-  fluidRow(
-    titlePanel("國立台北商業大學 校務永續發展中心"),
-    img(src="campus_logo.png", height=75, width=180)
-  ),
-  selectInput("datasetA", 
-              label = "Dataset", 
-              choices = ls("package:datasets")),
-  verbatimTextOutput("summary"),
-  tableOutput("table")
+  mainPanel(
+    tabsetPanel(type = "tabs",
+                tabPanel("Raw Data"),
+                tabPanel("Visualize in ggplot"),
+                tabPanel("Data Preprocessing")
+      
+    )
+  )
+  
+  #selectInput("datasetA", 
+              #label = "Dataset", 
+              #choices = ls("package:datasets")),
+  #verbatimTextOutput("summary"),
+  #tableOutput("table")
 )
 
 # the server
