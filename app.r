@@ -98,14 +98,27 @@ server <- function(input, output, session) {
   observeEvent( input$goButton, {
     #print("Cliked")
     print(input$select_plot)
-    sel = input$select_plot
+    sel <- input$select_plot
     
+    # the Plot out
     output$plot <- renderPlot({
-      select = sel
+      #select <- sel
       
-      if (select == "geom_histogram"){
+      if (sel == "geom_histogram"){
         print("Hist Pick")
-        hist(df[1])
+        hist(df$SepalLengthCm)
+      }
+      if (sel == "geom_density"){
+        print("Density Pick")
+      }
+      if (sel == "geom_boxplot"){
+        print("Box Pick")
+      }
+      if (sel == "geom_violin"){
+        print("Violin Pick")
+      }
+      if (sel == "geom_point"){
+        print("Scatter Pick")
       }
       
     })
