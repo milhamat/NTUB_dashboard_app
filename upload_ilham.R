@@ -1,5 +1,6 @@
 library(shiny)
 library(datasets)
+library(ggplot2)
 
 ui <- shinyUI(fluidPage(
   titlePanel("國立台北商業大學 校務永續發展中心"),
@@ -134,6 +135,17 @@ server <- shinyServer(function(input, output, session) {
     if (input$select_plot=="geom_histogram"){
       x <- data()[, c(input$xcol)]
       hist(x)
+    }
+    if (input$select_plot=="geom_boxplot"){
+      x <- data()[, c(input$xcol)]
+      boxplot(x)
+    }
+    if (input$select_plot=="geom_density"){
+      x <- data()[, c(input$xcol)]
+      density(x)
+    }
+    if (input$select_plot=="geom_violin"){
+      
     }
     
   })
