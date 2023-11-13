@@ -2,7 +2,7 @@ library(shiny)
 
 # The UI
 ui <- fluidPage(
-  #"Hello, world!"
+  
   fluidRow(
     titlePanel("國立台北商業大學 校務永續發展中心"),
     img(src="campus_logo.png", height=75, width=180)
