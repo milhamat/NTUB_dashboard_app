@@ -21,4 +21,7 @@ colname <- c[2]
 print(data[colname])
 
 hist(data[colname])
+
+dat <- data.frame()
+dat <- data
       

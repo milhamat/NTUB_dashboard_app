@@ -17,7 +17,7 @@ ui <- fluidPage(
                            # Input Select a file ----
                            fileInput("file1", "Choose CSV File"),
                            multiple = FALSE,
-                           accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv"),
+                           accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv", ".xlsx"),
                            
                            # Input: Checkbox if file has header ----
                            checkboxInput("header", "Header", TRUE),
@@ -29,7 +29,6 @@ ui <- fluidPage(
                 
                 ## Panel Visual GGplot
                 tabPanel("Visualize in ggplot",
-                         plotOutput("plot"),
                          ## Side Bar Panel
                          sidebarPanel(
                            ## Select Input
@@ -43,7 +42,10 @@ ui <- fluidPage(
                                          "violin plot" = "geom_violin", 
                                          "scatter plot" = "geom_point")),
                            actionButton("goButton", "Update")
-                           )),
+                           ),
+                         mainPanel(
+                           plotOutput("plot1"))
+                         ),
                 
                 ## Panel Data Preporcessing
                 tabPanel("Data Preprocessing",
@@ -51,18 +53,12 @@ ui <- fluidPage(
                 
     )
   )
-  
-  #selectInput("datasetA", 
-  #label = "Dataset", 
-  #choices = ls("package:datasets")),
-  #verbatimTextOutput("summary"),
-  #tableOutput("table")
 )
 
 # the server
 server <- function(input, output, session) {
   
-  # first tab
+  # First tab
   output$raw_data <- DT::renderDataTable({
     
     # input$file1 will be NULL initially. After the user selects
@@ -79,6 +75,7 @@ server <- function(input, output, session) {
                        header = input$header,
                        sep = input$sep,
                        quote = input$quote)
+        data <- df
       },
       error = function(e) {
         # return a safeError if a parsing error occurs
@@ -88,54 +85,29 @@ server <- function(input, output, session) {
     return(df)
   })
   
+  # Select Input
+  observe({
+    inp <- switch (input$select_plot,
+                   geom_histogram="hist", 
+                   geom_density="dens",
+                   geom_boxplot="boxp", 
+                   geom_violin="viol", 
+                   geom_point="sctr"
+    )
+  })
+  
+  # Second Tab
+  observeEvent(input$goButton, 
+               print(input$select_plot))
+  
   output$plot1 <- renderPlot({
-    ggplot()
-    +input$Select_plot(data = df, mapping = aes(x = input$aes_x, y = input$aes_y))
+    if (input$select_plot=="geom_histogram"){
+      #print(summary(df))
+      hist(df$SepalLengthCm)
+    }
+    #ggplot()
+    #+input$Select_plot(data = df, mapping = aes(x = input$aes_x, y = input$aes_y))
   })
-  
-  sel = ''
-  # Button Actions
-  observeEvent( input$goButton, {
-    #print("Cliked")
-    print(input$select_plot)
-    sel <- input$select_plot
-    
-    # the Plot out
-    output$plot <- renderPlot({
-      #select <- sel
-      
-      if (sel == "geom_histogram"){
-        print("Hist Pick")
-        hist(df$SepalLengthCm)
-      }
-      if (sel == "geom_density"){
-        print("Density Pick")
-      }
-      if (sel == "geom_boxplot"){
-        print("Box Pick")
-      }
-      if (sel == "geom_violin"){
-        print("Violin Pick")
-      }
-      if (sel == "geom_point"){
-        print("Scatter Pick")
-      }
-      
-    })
-    
-  })
- 
-  
-  
-  #output$summary <- renderPrint({
-    #datasetA <- get(input$datasetA, "package:datasets")
-    #summary(datasetA)
-  #})
-  
-  #output$table <- renderTable({
-    #datasetA <- get(input$datasetA, "package:datasets")
-    #datasetA
-  #})
 }
 
 # the 
