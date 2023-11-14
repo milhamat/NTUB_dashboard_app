@@ -21,7 +21,7 @@ ui <- shinyUI(fluidPage(
                                     'text/comma-separated-values,text/plain', 
                                     '.csv')),
                  
-                 # added interface for uploading data from
+                 ## added interface for uploading data from
                  # http://shiny.rstudio.com/gallery/file-upload.html
                  tags$br(),
                  ## Checking box
@@ -46,7 +46,7 @@ ui <- shinyUI(fluidPage(
                )
              )
     ),
-    tabPanel("Visualize in ggplot", # First Type
+    tabPanel("Visualize in ggplot", ## First Type
              pageWithSidebar(
                headerPanel('My First Plot'),
                sidebarPanel(
@@ -60,7 +60,7 @@ ui <- shinyUI(fluidPage(
                                "violin plot" = "geom_violin", 
                                "scatter plot" = "geom_point")),
                  
-                 # "Empty inputs" - they will be updated after the data is uploaded
+                 ## "Empty inputs" - they will be updated after the data is uploaded
                  selectInput('xcol', 'X Variable', ""),
                  selectInput('ycol', 'Y Variable', "", selected = "")
                  
@@ -77,7 +77,7 @@ ui <- shinyUI(fluidPage(
 )
 
 server <- shinyServer(function(input, output, session) {
-  # added "session" because updateSelectInput requires it
+  ## added "session" because updateSelectInput requires it
   
   
   data <- reactive({ 
@@ -99,39 +99,30 @@ server <- shinyServer(function(input, output, session) {
     return(df)
   })
   
-  # Showing Raw Data Table
+  ## Showing Raw Data Table
   output$contents <- renderTable({
     data()
   })
   
+  ## For Plotting
   output$MyPlot <- renderPlot({
-    
     dat <- data()[, c(input$xcol, input$ycol)]
-    #xin <- input$xcol
-    #yin <- input$ycol
-    #dat %>%
-      #ggplot(aes_string(x=xin))+geom_histogram(colour='darkblue')
     
     if (input$select_plot=="geom_histogram"){
       dat %>%
         ggplot(aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
-      #ggplot(data(), aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
     } else if (input$select_plot=="geom_density"){
       dat %>%
         ggplot(aes_string(x=input$xcol))+geom_density(colour='darkblue')
-      #ggplot(data(), aes_string(x=input$xcol))+geom_density(colour='darkblue')
     } else if (input$select_plot=="geom_boxplot"){
       dat %>%
         ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_boxplot(colour='darkblue')
-      #ggplot(data(), aes(x=input$xcol, y=input$ycol))+geom_boxplot(colour='darkblue')
     } else if (input$select_plot=="geom_violin"){
       dat %>%
         ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_violin(colour='darkblue')
-      #ggplot(data(), aes(x=input$xcol, y=input$ycol))+geom_violin(colour='darkblue')
     } else if (input$select_plot=="geom_point"){
       dat %>%
         ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
-      #ggplot(data(),aes(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
     }
   },height = 400,width = 600
   )
