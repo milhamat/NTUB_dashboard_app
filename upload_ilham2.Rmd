@@ -1,0 +1,211 @@
+---
+title: "upload_ilham"
+author: "maxidi"
+date: "2023-11-14"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(shiny)
+library(datasets)
+library(ggplot2)
+```
+
+This R Markdown document is made interactive using Shiny. Unlike the more traditional workflow of creating static reports, you can now create documents that allow your readers to change the assumptions underlying your analysis and see the results immediately. 
+
+To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authoring_shiny.html).
+
+## Inputs and Outputs
+
+You can embed Shiny inputs and outputs in your document. Outputs are automatically updated whenever inputs change.  This demonstrates how a standard R plot can be made interactive by wrapping it in the Shiny `renderPlot` function. The `selectInput` and `sliderInput` functions create the input widgets used to drive the plot.
+
+```{r eruptions, echo=FALSE}
+ui <- shinyUI(fluidPage(
+  ## Title
+  titlePanel("國立台北商業大學 校務永續發展中心"),
+  ## Image
+  img(src="campus_logo.png", height=70, width=200),
+  br(),
+  ## Tabs
+  tabsetPanel(
+    ## Tabs panel
+    tabPanel("Raw Data", # Upload File
+             ## Title panel
+             titlePanel("Uploading Files"),
+             sidebarLayout(
+               sidebarPanel(
+                 fileInput('file1', 'Choose CSV File',
+                           accept=c('text/csv', 
+                                    'text/comma-separated-values,text/plain', 
+                                    '.csv')),
+                 
+                 # added interface for uploading data from
+                 # http://shiny.rstudio.com/gallery/file-upload.html
+                 tags$br(),
+                 ## Checking box
+                 checkboxInput('header', 'Header', TRUE),
+                 ## Radio Buttons
+                 radioButtons('sep', 'Separator',
+                              c(Comma=',',
+                                Semicolon=';',
+                                Tab='\t'),
+                              ','),
+                 ## Radio Buttons
+                 radioButtons('quote', 'Quote',
+                              c(None='',
+                                'Double Quote'='"',
+                                'Single Quote'="'"),
+                              '"')
+                 
+               ),
+               ## Main Panel
+               mainPanel(
+                 ## Table Out
+                 tableOutput('contents')
+               )
+             )
+    ),
+    tabPanel("Visualize in ggplot", # First Type
+             pageWithSidebar(
+               headerPanel('My First Plot'),
+               sidebarPanel(
+                 selectInput(
+                   inputId = "select_plot",
+                   label = "plot",
+                   choices = c("-", 
+                               "histogram" = "geom_histogram", 
+                               "density plot" = "geom_density",
+                               "box plot" = "geom_boxplot", 
+                               "violin plot" = "geom_violin", 
+                               "scatter plot" = "geom_point")),
+                 
+                 # "Empty inputs" - they will be updated after the data is uploaded
+                 selectInput('xcol', 'X Variable', ""),
+                 selectInput('ycol', 'Y Variable', "", selected = "")
+                 
+               ),
+               mainPanel(
+                 ## Plot Out
+                 plotOutput('MyPlot')
+               )
+             )
+    )
+    
+  )
+)
+)
+```
+
+## Embedded Application
+
+It's also possible to embed an entire Shiny application within an R Markdown document using the `shinyAppDir` function. This example embeds a Shiny application located in another directory:
+
+```{r tabsets, echo=FALSE}
+server <- shinyServer(function(input, output, session) {
+  # added "session" because updateSelectInput requires it
+  
+  
+  data <- reactive({ 
+    req(input$file1) ## ?req #  require that the input is available
+    
+    inFile <- input$file1 
+    
+    # tested with a following dataset: write.csv(mtcars, "mtcars.csv")
+    # and                              write.csv(iris, "iris.csv")
+    df <- read.csv(inFile$datapath, header = input$header, sep = input$sep,
+                   quote = input$quote)
+    
+    
+    # Update inputs (you could create an observer with both updateSel...)
+    # You can also constraint your choices. If you wanted select only numeric
+    # variables you could set "choices = sapply(df, is.numeric)"
+    # It depends on what do you want to do later on.
+    
+    ## For updating the x and y axis feature 
+    updateSelectInput(session, inputId = 'xcol', label = 'X Variable',
+                      choices = names(df), selected = names(df)[1])
+    updateSelectInput(session, inputId = 'ycol', label = 'Y Variable',
+                      choices = names(df), selected = names(df)[1])
+                      #choices = names(df), selected = names(df)[2])
+    
+    return(df)
+  })
+  
+  output$contents <- renderTable({
+    data()
+  })
+  
+  # Select Input
+  #reactive({
+    #if (input$select_plot=="geom_histogram"){
+      #updateSelectInput(session, "ycol",
+                        #choices = "-")
+    #}else{
+      #updateSelectInput(session, inputId = 'xcol', label = 'X Variable',
+                        #choices = names(df), selected = names(df))
+      #updateSelectInput(session, inputId = 'ycol', label = 'Y Variable',
+                        #choices = names(df), selected = names(df)[2])
+    #}
+  #})
+  
+  
+  output$MyPlot <- renderPlot({
+    # for a histogram: remove the second variable (it has to be numeric as well):
+    # x    <- data()[, c(input$xcol, input$ycol)]
+    # bins <- nrow(data())
+    # hist(x, breaks = bins, col = 'darkgray', border = 'white')
+    
+    # Correct way:
+    # x    <- data()[, input$xcol]
+    # bins <- nrow(data())
+    # hist(x, breaks = bins, col = 'darkgray', border = 'white')
+    
+    
+    ## I Since you have two inputs I decided to make a scatterplot
+    ## the dataset
+    #dat <- data()[, c(input$xcol, input$ycol)]
+    
+    if (input$select_plot=="geom_point"){
+      #plot(data())
+      g <- ggplot(data(), aes(x=input$xcol, y=input$ycol))
+      g <- g+geom_point()
+      plot(g)
+    }
+    if (input$select_plot=="geom_histogram"){
+      #hist(data())
+      #print(input$xcol)
+      #print(data())
+      g <- ggplot(data(), aes(x=input$xcol))+geom_histogram()
+      plot(g)
+    }
+    if (input$select_plot=="geom_boxplot"){
+      #boxplot(data())
+      g <- ggplot(data(), aes(x=input$xcol, y=input$ycol))
+      g <- g+geom_boxplot()
+      plot(g)
+    }
+    if (input$select_plot=="geom_density"){
+      g <- ggplot(data(), aes(x=input$xcol))
+      g <- g+geom_density()
+      plot(g)
+    }
+    if (input$select_plot=="geom_violin"){
+      g <- ggplot(data(), aes(x=input$xcol, y=input$ycol))
+      g <- g+geom_violin()
+      plot(g)
+    } 
+  },height = 400,width = 600)
+})
+
+shinyApp(ui, server)
+```
+
+Note the use of the `height` parameter to determine how much vertical space the embedded application should occupy.
+
+You can also use the `shinyApp` function to define an application inline rather then in an external directory.
+
+In all of R code chunks above the `echo = FALSE` attribute is used. This is to prevent the R code within the chunk from rendering in the document alongside the Shiny components.
+
+
+

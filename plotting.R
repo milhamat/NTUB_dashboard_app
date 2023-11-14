@@ -24,8 +24,18 @@ hist(data[colname])
 
 dat <- data.frame()
 dat <- data
-      
+
+print(typeof(data)) # list
+print(typeof(data$SepalLengthCm))
+
+ggplot(data, aes(x=SepalLengthCm, y=SepalWidthCm))+geom_violin()
+
+ggplot(data, aes(x=SepalLengthCm, y=SepalWidthCm))+geom_boxplot()
 
 v <- ggplot(data, aes(x=SepalLengthCm, y=SepalWidthCm)) +
-  geom_violin()
+  geom_point()
+v
+
+v <- ggplot(data, aes(x=SepalLengthCm)) +
+  geom_density()
 v
