@@ -107,37 +107,33 @@ server <- shinyServer(function(input, output, session) {
   output$MyPlot <- renderPlot({
     
     dat <- data()[, c(input$xcol, input$ycol)]
-    xin <- input$xcol
+    #xin <- input$xcol
     #yin <- input$ycol
-    dat %>%
-      ggplot(aes_string(x=xin))+geom_histogram(colour='darkblue')
+    #dat %>%
+      #ggplot(aes_string(x=xin))+geom_histogram(colour='darkblue')
     
-    #if (input$select_plot=="geom_histogram"){
-      #dat %>%
-        #ggplot(aes(x=input$xcol))+geom_histogram(colour='darkblue')
-      #ggplot(data(), aes(x=input$xcol))+geom_histogram(colour='darkblue')
-    #}
-    #if (input$select_plot=="geom_density"){
-      #dat %>%
-        #ggplot(aes(x=input$xcol))+geom_density(colour='darkblue')
-      #ggplot(data(), aes(x=input$xcol))+geom_density(colour='darkblue')
-    #}
-    #if (input$select_plot=="geom_boxplot"){
-      #dat %>%
-        #ggplot(aes(x=input$xcol, y=input$ycol))+geom_boxplot(colour='darkblue')
+    if (input$select_plot=="geom_histogram"){
+      dat %>%
+        ggplot(aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
+      #ggplot(data(), aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
+    } else if (input$select_plot=="geom_density"){
+      dat %>%
+        ggplot(aes_string(x=input$xcol))+geom_density(colour='darkblue')
+      #ggplot(data(), aes_string(x=input$xcol))+geom_density(colour='darkblue')
+    } else if (input$select_plot=="geom_boxplot"){
+      dat %>%
+        ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_boxplot(colour='darkblue')
       #ggplot(data(), aes(x=input$xcol, y=input$ycol))+geom_boxplot(colour='darkblue')
-    #}
-    #if (input$select_plot=="geom_violin"){
-      #dat %>%
-        #ggplot(aes(x=input$xcol, y=input$ycol))+geom_violin(colour='darkblue')
+    } else if (input$select_plot=="geom_violin"){
+      dat %>%
+        ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_violin(colour='darkblue')
       #ggplot(data(), aes(x=input$xcol, y=input$ycol))+geom_violin(colour='darkblue')
-    #} 
-    #if (input$select_plot=="geom_point"){
-      #dat %>%
-        #ggplot(aes(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
+    } else if (input$select_plot=="geom_point"){
+      dat %>%
+        ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
       #ggplot(data(),aes(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
-    #}
-  }#,height = 400,width = 600
+    }
+  },height = 400,width = 600
   )
 })
 
