@@ -48,7 +48,7 @@ ui <- shinyUI(fluidPage(
     ),
     tabPanel("Visualize in ggplot", ## First Type
              pageWithSidebar(
-               headerPanel('My First Plot'),
+               headerPanel('Plots'),
                sidebarPanel(
                  selectInput(
                    inputId = "select_plot",
@@ -66,8 +66,10 @@ ui <- shinyUI(fluidPage(
                  
                ),
                mainPanel(
+                 p("Note: the plots only take numeric data!"),
                  ## Plot Out
-                 plotOutput('MyPlot')
+                 plotOutput('MyPlot'),
+                 
                )
              )
     )
