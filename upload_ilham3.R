@@ -92,10 +92,10 @@ ui <- shinyUI(fluidPage(
                     inputId = "three_var_pick",
                     label = "Plot Options",
                     choices = c(
-                                "contour" = "geom_contour", 
-                                "contour filled" = "geom_contour_filled",
-                                "raster" = "geom_raster",
-                                "tile" = "geom_tile"
+                                "Contour" = "geom_contour", 
+                                "Contour Filled" = "geom_contour_filled",
+                                "Raster" = "geom_raster",
+                                "Tile" = "geom_tile"
                     )
                   )
                 ),
@@ -123,7 +123,7 @@ ui <- shinyUI(fluidPage(
                     inputId = "disct_pick",
                     label = "Plot Options",
                     choices = c(
-                                "bar plot" = "geom_bar"
+                                "Bar Plot" = "geom_bar"
                     )
                   )
                 ),
@@ -135,12 +135,12 @@ ui <- shinyUI(fluidPage(
                     inputId = "both_conti_pick",
                     label = "Plot Options",
                     choices = c(
-                                "label" = "geom_label",
-                                "point" = "geom_point",
-                                "quantile" = "geom_quantile",
-                                "rug" = "geom_rug",
-                                "smooth" = "smooth",
-                                "text" = "geom_text"
+                                "Label" = "geom_label",
+                                "Point" = "geom_point",
+                                "Quantile" = "geom_quantile",
+                                "Rug" = "geom_rug",
+                                "Smooth" = "smooth",
+                                "Text" = "geom_text"
                     )
                   )
                 ),
@@ -151,10 +151,10 @@ ui <- shinyUI(fluidPage(
                     inputId = "one_dist_one_pick",
                     label = "Plot Options",
                     choices = c(
-                                "col" = "geom_col",
-                                "boxplot" = "geom_boxplot", 
-                                "dotplot" = "goem_dotplot",
-                                "violin" = "geom_violin"
+                                "Col" = "geom_col",
+                                "Boxplot" = "geom_boxplot", 
+                                "Dotplot" = "goem_dotplot",
+                                "Violin" = "geom_violin"
                     )
                   )
                 ),
@@ -165,8 +165,8 @@ ui <- shinyUI(fluidPage(
                     inputId = "both_dist_pick",
                     label = "Plot Options",
                     choices = c(
-                                "count" = "geom_count",
-                                "jitter" = "geom_jitter"
+                                "Count" = "geom_count",
+                                "Jitter" = "geom_jitter"
                     )
                   )
                 ),
@@ -256,6 +256,8 @@ server <- shinyServer(function(input, output, session) {
                       choices = names(df), selected = names(df)[1])
     updateSelectInput(session, inputId = 'ycol', label = 'Y Variable',
                       choices = names(df), selected = names(df)[1])
+    updateSelectInput(session, inputId = 'zcol', label = 'Z Variable',
+                      choices = names(df), selected = names(df)[1])
     #choices = names(df), selected = names(df)[2])
     #print(df)
     
@@ -270,6 +272,10 @@ server <- shinyServer(function(input, output, session) {
   ## For Plotting
   output$MyPlot <- renderPlot({
     dat <- data()[, c(input$xcol, input$ycol)]
+
+    ## ONE VARIABLE
+    ## TWO VARIABLE
+    ## THREE VARIABLE
     
     if (input$select_plot=="geom_histogram"){
       dat %>%
