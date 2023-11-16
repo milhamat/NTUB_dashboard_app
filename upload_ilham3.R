@@ -56,8 +56,9 @@ ui <- shinyUI(fluidPage(
                                "One Variable" = "one_var", 
                                "Two Variable" = "two_var",
                                "Three Variable" = "three_var"
-                               )
-                              ),
+                    )
+                ),
+                ##########################################
                 ## one Variable Pick
                 conditionalPanel(
                   condition = "input.n_var == 'one_var'",
@@ -101,6 +102,7 @@ ui <- shinyUI(fluidPage(
                     )
                   )
                 ),
+                ######################
                 ### ONE VAR
                 ## conti Pick
                 conditionalPanel(
@@ -129,6 +131,7 @@ ui <- shinyUI(fluidPage(
                     )
                   )
                 ),
+                ######################
                 ### TWO VAR
                 ## both conti
                 conditionalPanel(
@@ -209,10 +212,13 @@ ui <- shinyUI(fluidPage(
                     )
                   )
                 ),
+                ######################
                  ## "Empty inputs" - they will be updated after the data is uploaded
+                 ## X variable
                  selectInput('xcol', 
                              'X Variable', 
                              ""),
+                 ## Y variable
                  conditionalPanel(
                   condition = "input.n_var != 'one_var'",
                     selectInput('ycol', 
@@ -221,6 +227,7 @@ ui <- shinyUI(fluidPage(
                                 selected = ""
                     )
                   ),
+                 ## Z variable
                  conditionalPanel(
                   condition = "input.n_var == 'three_var'",
                     selectInput('zcol', 
@@ -230,6 +237,7 @@ ui <- shinyUI(fluidPage(
                     )
                   )
                ),
+               ################
                mainPanel(
                  p("Note: the plots only take numeric data!"),
                  ## Plot Out
@@ -244,7 +252,7 @@ ui <- shinyUI(fluidPage(
 server <- shinyServer(function(input, output, session) {
   ## added "session" because updateSelectInput requires it
   
-  
+  ## Initialize the dataset
   data <- reactive({ 
     req(input$file1) ## ?req #  require that the input is available
     
@@ -273,16 +281,19 @@ server <- shinyServer(function(input, output, session) {
   
   ## For Plotting
   output$MyPlot <- renderPlot({
-    dat <- data()[, c(input$xcol, input$ycol)]
+    ### Important for updating the layout
+    ### we need to reinitialize the dataset
+    dat <- data()[, c(input$xcol, input$ycol, input$zcol)]
 
-    ## ONE VARIABLE
-    ## TWO VARIABLE
-    ## THREE VARIABLE
-    
+    ### ONE VARIABLE
     if (input$conti_pick=="geom_histogram"){
       dat %>%
         ggplot(aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
     } 
+    ### TWO VARIABLE
+    ### THREE VARIABLE
+    
+    
     # else if (input$select_plot=="geom_density"){
     #   dat %>%
     #     ggplot(aes_string(x=input$xcol))+geom_density(colour='darkblue')
