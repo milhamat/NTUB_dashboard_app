@@ -1,13 +1,14 @@
 library(shiny)
 library(datasets)
 library(ggplot2)
-
+###################################################################################################
 ui <- shinyUI(fluidPage(
   ## Title
   titlePanel("國立台北商業大學 校務永續發展中心"),
   ## Image
   img(src="campus_logo.png", height=80, width=300),
   br(),
+  ###################################################################################################
   ## Tabs
   tabsetPanel(
     ## Tabs panel
@@ -43,6 +44,7 @@ ui <- shinyUI(fluidPage(
                )
              )
     ),
+    ###################################################################################################
     tabPanel("Visualize in ggplot", ## First Type
              pageWithSidebar(
                headerPanel('Plots'),
@@ -238,7 +240,7 @@ ui <- shinyUI(fluidPage(
        )
     )
  )
-
+###################################################################################################
 server <- shinyServer(function(input, output, session) {
   ## added "session" because updateSelectInput requires it
   
@@ -277,24 +279,25 @@ server <- shinyServer(function(input, output, session) {
     ## TWO VARIABLE
     ## THREE VARIABLE
     
-    if (input$select_plot=="geom_histogram"){
+    if (input$conti_pick=="geom_histogram"){
       dat %>%
         ggplot(aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
-    } else if (input$select_plot=="geom_density"){
-      dat %>%
-        ggplot(aes_string(x=input$xcol))+geom_density(colour='darkblue')
-    } else if (input$select_plot=="geom_boxplot"){
-      dat %>%
-        ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_boxplot(colour='darkblue')
-    } else if (input$select_plot=="geom_violin"){
-      dat %>%
-        ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_violin(colour='darkblue')
-    } else if (input$select_plot=="geom_point"){
-      dat %>%
-        ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
-    }
+    } 
+    # else if (input$select_plot=="geom_density"){
+    #   dat %>%
+    #     ggplot(aes_string(x=input$xcol))+geom_density(colour='darkblue')
+    # } else if (input$select_plot=="geom_boxplot"){
+    #   dat %>%
+    #     ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_boxplot(colour='darkblue')
+    # } else if (input$select_plot=="geom_violin"){
+    #   dat %>%
+    #     ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_violin(colour='darkblue')
+    # } else if (input$select_plot=="geom_point"){
+    #   dat %>%
+    #     ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
+    # }
   },height = 400,width = 600
   )
 })
-
+###################################################################################################
 shinyApp(ui, server)
