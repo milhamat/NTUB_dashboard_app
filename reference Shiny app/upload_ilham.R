@@ -6,7 +6,7 @@ ui <- shinyUI(fluidPage(
   ## Title
   titlePanel("國立台北商業大學 校務永續發展中心"),
   ## Image
-  #img(src="campus_logo.png", height=70, width=200),
+  img(src="campus_logo.png", height=80, width=300),
   br(),
   ## Tabs
   tabsetPanel(
