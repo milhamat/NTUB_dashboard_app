@@ -307,8 +307,9 @@ server <- shinyServer(function(input, output, session) {
        ggplot(dat, aes_string(x=input$xcol))+geom_freqpoly()
     } else if (input$conti_pick=="geom_qq") { # geom_qq
        ggplot(dat, aes_string(sample=input$xcol))+stat_qq()
-    } 
+    }  
     
+    # print(input$disct_pick)
     # if (input$disct_pick=="geom_bar"){ ## disct # geom_bar
     #   ggplot(dat, aes_string(x=input$xcol))+geom_bar()
     # }
@@ -364,8 +365,13 @@ server <- shinyServer(function(input, output, session) {
     # geom_raster
     # geom_tile
     
-  },height = 400,width = 600
+  } ,height = 400, width = 600
   )
+  
+  # output$MyPlot <- renderPlot({
+  #   print(input$disct_pick)
+  # })
+  
 })
 ###################################################################################################
 shinyApp(ui, server)
