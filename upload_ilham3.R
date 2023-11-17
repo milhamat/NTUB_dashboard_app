@@ -184,9 +184,9 @@ ui <- shinyUI(fluidPage(
                     inputId = "conti_bivar_dist_pick",
                     label = "Plot Options",
                     choices = c("-" = "-",
-                                "bin2d" = "geom_bin2d",
-                                "desity 2d" = "geom_desity_2d",
-                                "hex" = "geom_hex"
+                                "Bin2d" = "geom_bin2d",
+                                "Desity 2d" = "geom_desity_2d",
+                                "Hex" = "geom_hex"
                     )
                   )
                 ),
@@ -197,9 +197,23 @@ ui <- shinyUI(fluidPage(
                     inputId = "conti_func_pick",
                     label = "Plot Options",
                     choices = c("-" = "-",
-                                "area" = "geom_area_two",
-                                "line" = "geom_line",
-                                "step" = "geom_step"
+                                "Area" = "geom_area_two",
+                                "Line" = "geom_line",
+                                "Step" = "geom_step"
+                    )
+                  )
+                ),
+                ## Vis Error
+                conditionalPanel(
+                  condition = "input.two_var_pick == 'vis_err' && input.n_var != 'one_var' && input.n_var != 'three_var'",
+                  selectInput(
+                    inputId = "vis_err_pick",
+                    label = "Plot Options",
+                    choices = c("-" = "-",
+                                "Cross Bar" = "geom_crossbar",
+                                "Error Bar" = "geom_errorbar",
+                                "Line Range" = "geom_linerange",
+                                "Point Range" = "geom_pointrange"
                     )
                   )
                 ),
@@ -210,7 +224,7 @@ ui <- shinyUI(fluidPage(
                     inputId = "maps_pick",
                     label = "Plot Options",
                     choices = c("-" = "-",
-                                "maps" = "geom_map"
+                                "Maps" = "geom_map"
                     )
                   )
                 ),
@@ -237,7 +251,25 @@ ui <- shinyUI(fluidPage(
                                 "", 
                                 selected = ""
                     )
-                  )
+                  ),
+                 ## Ymin
+                 conditionalPanel(
+                  condition = "input.n_var == 'two_var' && input.two_var_pick == 'vis_err'",
+                    selectInput('ymin', 
+                                'Ymin', 
+                                "", 
+                                selected = ""
+                    )
+                  ),
+                 ## Ymax
+                 conditionalPanel(
+                  condition = "input.n_var == 'two_var' && input.two_var_pick == 'vis_err'",
+                    selectInput('ymax', 
+                                'Ymax', 
+                                "", 
+                                selected = ""
+                    )
+                  ),
                ),
                ################
                mainPanel(
@@ -269,6 +301,10 @@ server <- shinyServer(function(input, output, session) {
     updateSelectInput(session, inputId = 'ycol', label = 'Y Variable',
                       choices = names(df), selected = names(df)[1])
     updateSelectInput(session, inputId = 'zcol', label = 'Z Variable',
+                      choices = names(df), selected = names(df)[1])
+    updateSelectInput(session, inputId = 'ymin', label = 'Ymin',
+                      choices = names(df), selected = names(df)[1])
+    updateSelectInput(session, inputId = 'ymax', label = 'Ymax',
                       choices = names(df), selected = names(df)[1])
     #choices = names(df), selected = names(df)[2])
     #print(df)
@@ -321,7 +357,7 @@ server <- shinyServer(function(input, output, session) {
       if (input$both_conti_pick=="geom_point"){
         ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
       } else if (input$both_conti_pick=="geom_label"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, label=rownames(dat)))+geom_label() #NO
+        ggplot(dat, aes(x=input$xcol, y=input$ycol, label=rownames(dat)))+geom_label() #NO
       } else if (input$both_conti_pick=="geom_quantile") {
         ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_quantile()
       } else if (input$both_conti_pick=="geom_rug"){
@@ -329,7 +365,7 @@ server <- shinyServer(function(input, output, session) {
       } else if (input$both_conti_pick=="smooth"){
         ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_smooth()
       } else if (input$both_conti_pick=="geom_text"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, label=rownames(dat)))+geom_text() #NO
+        ggplot(dat, aes(x=input$xcol, y=input$ycol, label=rownames(dat)))+geom_text() #NO
       }
     } else if (input$n_var=="two_var"&&input$two_var_pick=="one_dist_one_conti"){
       if (input$one_dist_one_pick=="geom_boxplot"){
@@ -352,9 +388,10 @@ server <- shinyServer(function(input, output, session) {
         ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_bin_2d()
       } else if (input$conti_bivar_dist_pick=="geom_desity_2d"){
         ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_density_2d()
-      } else if (input$conti_bivar_dist_pick=="geom_hex"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_hex() #NO
-      }
+      } 
+      #else if (input$conti_bivar_dist_pick=="geom_hex"){
+        #ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_hex() #NO
+      #}
     } else if (input$n_var=="two_var"&&input$two_var_pick=="conti_func"){
       if (input$conti_func_pick=="geom_area_two"){
         ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_area()
@@ -363,10 +400,21 @@ server <- shinyServer(function(input, output, session) {
       } else if (input$conti_func_pick=="geom_step"){
         ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_step()
       }
+    } else if (input$n_var=="two_var"&&input$two_var_pick=="vis_err") {
+       if (input$vis_err_pick=="geom_crossbar") {
+         ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_crossbar(ymin=input$ymin, ymax=input$ymax, fatten=1)
+       } else if (input$vis_err_pick=="geom_errorbar") {
+         ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_errorbar()
+       } else if (input$vis_err_pick=="geom_linerange") {
+         ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_linerange()
+       } else if (input$vis_err_pick=="geom_pointrange") {
+         ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_pointrange()
+       }
     } else if (input$n_var=="two_var"&&input$two_var_pick=="maps"){
-      if (input$maps_pick=="geom_map"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_map() #NO
-      }
+      print("Maps")
+      #if (input$maps_pick=="geom_map"){
+        #ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_map() #NO
+      #}
     } else if (input$n_var=="three_var"){
       if (input$three_var_pick=="geom_contour"){
         ggplot(dat, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_contour()
@@ -378,7 +426,8 @@ server <- shinyServer(function(input, output, session) {
         ggplot(dat, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_tile()
       }
     }
-  
+    
+    #NOTE
     ### TWO VARIABLE
     ## both_conti_pick
     # geom_label NO
@@ -393,7 +442,11 @@ server <- shinyServer(function(input, output, session) {
     ## maps_pick
     # geom_map NO
 
-    
+    # geom_crossbar NO
+    # geom_errorbar NO
+    # geom_linerange NO
+    # geom_pointrange NO
+
   } ,height = 400, width = 600
   )
   
