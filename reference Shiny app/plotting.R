@@ -32,10 +32,15 @@ ggplot(data, aes(x=SepalLengthCm, y=SepalWidthCm))+geom_violin()
 
 ggplot(data, aes(x=SepalLengthCm, y=SepalWidthCm))+geom_boxplot()
 
-v <- ggplot(data, aes(x=SepalLengthCm, y=SepalWidthCm)) +
-  geom_point()
-v
+ggplot(data, aes(x=SepalLengthCm, y=SepalWidthCm))+geom_point()
 
-v <- ggplot(data, aes(x=SepalLengthCm)) +
-  geom_density()
-v
+ggplot(data, aes(x=SepalLengthCm))+geom_density()
+
+ggplot(data, aes(x=SepalLengthCm))+geom_area(stat="bin")
+
+ggplot(data, aes(x=SepalLengthCm))+geom_dotplot()
+
+ggplot(data, aes(sample=SepalLengthCm))+stat_qq()
+
+ggplot(data, aes(x=SepalLengthCm))+geom_freqpoly()
+

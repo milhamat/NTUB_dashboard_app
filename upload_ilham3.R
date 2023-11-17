@@ -39,8 +39,10 @@ ui <- shinyUI(fluidPage(
                ),
                ## Main Panel
                mainPanel(
+                 verbatimTextOutput("summary"),
                  ## Table Out
-                 tableOutput('contents')
+                 DT::dataTableOutput("table")
+                 #tableOutput('contents')
                )
              )
     ),
@@ -273,10 +275,16 @@ server <- shinyServer(function(input, output, session) {
     
     return(df)
   })
-  
+  output$summary <- renderPrint({
+    summary(data())
+  })
   ## Showing Raw Data Table
-  output$contents <- renderTable({
-    data()
+  output$table <- DT::renderDataTable({
+    dat <- data()
+    tryCatch({
+      dat
+    })
+    return(dat)
   })
   
   ## For Plotting
@@ -286,27 +294,76 @@ server <- shinyServer(function(input, output, session) {
     dat <- data()[, c(input$xcol, input$ycol, input$zcol)]
 
     ### ONE VARIABLE
-    if (input$conti_pick=="geom_histogram"){
-      dat %>%
-        ggplot(aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
+    ## conti
+    if (input$conti_pick=="geom_histogram"){ # geom_histogram
+      ggplot(dat, aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
+    } else if (input$conti_pick=="geom_density"){ # geom_density
+      ggplot(dat, aes_string(x=input$xcol))+geom_density(colour='darkblue')
+    } else if (input$conti_pick=="geom_area_one") { # geom_area_one
+      ggplot(dat, aes_string(x=input$xcol))+geom_area(stat="bin")
+    } else if (input$conti_pick=="geom_dotplot") { # geom_dotplot
+       ggplot(dat, aes_string(x=input$xcol))+geom_dotplot()
+    } else if (input$conti_pick=="geom_freqpoly") { # geom_freqpoly
+       ggplot(dat, aes_string(x=input$xcol))+geom_freqpoly()
+    } else if (input$conti_pick=="geom_qq") { # geom_qq
+       ggplot(dat, aes_string(sample=input$xcol))+stat_qq()
     } 
-    ### TWO VARIABLE
-    ### THREE VARIABLE
     
-    
-    # else if (input$select_plot=="geom_density"){
-    #   dat %>%
-    #     ggplot(aes_string(x=input$xcol))+geom_density(colour='darkblue')
-    # } else if (input$select_plot=="geom_boxplot"){
-    #   dat %>%
-    #     ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_boxplot(colour='darkblue')
-    # } else if (input$select_plot=="geom_violin"){
-    #   dat %>%
-    #     ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_violin(colour='darkblue')
-    # } else if (input$select_plot=="geom_point"){
-    #   dat %>%
-    #     ggplot(aes_string(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
+    # if (input$disct_pick=="geom_bar"){ ## disct # geom_bar
+    #   ggplot(dat, aes_string(x=input$xcol))+geom_bar()
     # }
+    
+    
+    
+
+    ### TWO VARIABLE
+    ## both_conti_pick
+    # geom_point
+    # if (input$both_conti_pick=="geom_point"){
+    #   ggplot(dat, aes_string(x=input$xcol))+geom_point(colour='darkblue')
+    #   }
+    # geom_label
+    # geom_quantile
+    # geom_rug
+    # smooth
+    # geom_text
+    
+    ## one_dist_one_pick
+    # geom_boxplot
+    # if (input$one_dist_one_pick=="geom_boxplot"){
+    #   ggplot(dat, aes_string(x=input$xcol))+geom_boxplot(colour='darkblue')
+    #   }
+    # geom_violin
+    # else if (input$one_dist_one_pick=="geom_violin"){
+    #   ggplot(dat, aes_string(x=input$xcol))+geom_violin(colour='darkblue')
+    #   }
+    # geom_col
+    # geom_dotplot
+    
+    ## both_dist_pick
+    # geom_count
+    # geom_jitter
+
+    ## conti_bivar_dist_pick
+    # geom_bin2d
+    # geom_desity_2d
+    # geom_hex
+
+    ## conti_func_pick
+    # geom_area_two
+    # geom_line
+    # geom_step
+
+    ## maps_pick
+    # geom_map
+
+    ### THREE VARIABLE
+    ## three_var_pick
+    # geom_contour
+    # geom_contour_filled
+    # geom_raster
+    # geom_tile
+    
   },height = 400,width = 600
   )
 })
