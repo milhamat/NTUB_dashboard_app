@@ -295,8 +295,6 @@ server <- shinyServer(function(input, output, session) {
     ### Important for updating the layout
     ### we need to reinitialize the dataset
     dat <- data()[, c(input$xcol, input$ycol, input$zcol)]
-    #print(input$conti_pick)
-    #print(input$disct_pick)
     ### ONE VARIABLE
     ## conti
     conti <- input$conti_pick
@@ -319,74 +317,85 @@ server <- shinyServer(function(input, output, session) {
       if (disct=="geom_bar"){ ## disct # geom_bar
         ggplot(dat, aes_string(x=input$xcol))+geom_bar()
       }
+    } else if (input$n_var=="two_var"&&input$two_var_pick=="both_conti"){
+      if (input$both_conti_pick=="geom_point"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
+      } else if (input$both_conti_pick=="geom_label"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, label=rownames(dat)))+geom_label() #NO
+      } else if (input$both_conti_pick=="geom_quantile") {
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_quantile()
+      } else if (input$both_conti_pick=="geom_rug"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_rug(sides = "bl")
+      } else if (input$both_conti_pick=="smooth"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_smooth()
+      } else if (input$both_conti_pick=="geom_text"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, label=rownames(dat)))+geom_text() #NO
+      }
+    } else if (input$n_var=="two_var"&&input$two_var_pick=="one_dist_one_conti"){
+      if (input$one_dist_one_pick=="geom_boxplot"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_boxplot()
+      } else if (input$one_dist_one_pick=="geom_violin"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_violin()
+      } else if (input$one_dist_one_pick=="geom_col"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_col()
+      } else if (input$one_dist_one_pick=="geom_dotplot"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_dotplot(binaxis = "y", stackdir = "center") #NO
+      }
+    } else if (input$n_var=="two_var"&&input$two_var_pick=="both_dist"){
+      if (input$both_dist_pick=="geom_count"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_count()
+      } else if (input$both_dist_pick=="geom_jitter"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_jitter()
+      }
+    } else if (input$n_var=="two_var"&&input$two_var_pick=="conti_bivar_dist"){
+      if (input$conti_bivar_dist_pick=="geom_bin2d"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_bin_2d()
+      } else if (input$conti_bivar_dist_pick=="geom_desity_2d"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_density_2d()
+      } else if (input$conti_bivar_dist_pick=="geom_hex"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_hex() #NO
+      }
+    } else if (input$n_var=="two_var"&&input$two_var_pick=="conti_func"){
+      if (input$conti_func_pick=="geom_area_two"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_area()
+      } else if (input$conti_func_pick=="geom_line"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_line()
+      } else if (input$conti_func_pick=="geom_step"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_step()
+      }
+    } else if (input$n_var=="two_var"&&input$two_var_pick=="maps"){
+      if (input$maps_pick=="geom_map"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_map() #NO
+      }
+    } else if (input$n_var=="three_var"){
+      if (input$three_var_pick=="geom_contour"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_contour()
+      } else if (input$three_var_pick=="geom_contour_filled"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_contour_filled()
+      } else if (input$three_var_pick=="geom_raster"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_raster()
+      } else if (input$three_var_pick=="geom_tile"){
+        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_tile()
+      }
     }
-    # 
-     
-    
-    
-    
-   
-
-    # 
-    
-    
-    
-    
-
+  
     ### TWO VARIABLE
     ## both_conti_pick
-    # geom_point
-    # if (input$both_conti_pick=="geom_point"){
-    #   ggplot(dat, aes_string(x=input$xcol))+geom_point(colour='darkblue')
-    #   }
-    # geom_label
-    # geom_quantile
-    # geom_rug
-    # smooth
-    # geom_text
+    # geom_label NO
+    # geom_text NO
     
     ## one_dist_one_pick
-    # geom_boxplot
-    # if (input$one_dist_one_pick=="geom_boxplot"){
-    #   ggplot(dat, aes_string(x=input$xcol))+geom_boxplot(colour='darkblue')
-    #   }
-    # geom_violin
-    # else if (input$one_dist_one_pick=="geom_violin"){
-    #   ggplot(dat, aes_string(x=input$xcol))+geom_violin(colour='darkblue')
-    #   }
-    # geom_col
-    # geom_dotplot
-    
-    ## both_dist_pick
-    # geom_count
-    # geom_jitter
-
+    # geom_dotplot NO
+  
     ## conti_bivar_dist_pick
-    # geom_bin2d
-    # geom_desity_2d
-    # geom_hex
-
-    ## conti_func_pick
-    # geom_area_two
-    # geom_line
-    # geom_step
+    # geom_hex NO
 
     ## maps_pick
-    # geom_map
+    # geom_map NO
 
-    ### THREE VARIABLE
-    ## three_var_pick
-    # geom_contour
-    # geom_contour_filled
-    # geom_raster
-    # geom_tile
     
   } ,height = 400, width = 600
   )
-  
-  # output$MyPlot <- renderPlot({
-  #   print(input$disct_pick)
-  # })
   
 })
 ###################################################################################################
