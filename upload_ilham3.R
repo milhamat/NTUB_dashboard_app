@@ -96,7 +96,7 @@ ui <- shinyUI(fluidPage(
                   selectInput(
                     inputId = "three_var_pick",
                     label = "Plot Options",
-                    choices = c(
+                    choices = c("-" = "-",
                                 "Contour" = "geom_contour", 
                                 "Contour Filled" = "geom_contour_filled",
                                 "Raster" = "geom_raster",
@@ -112,7 +112,7 @@ ui <- shinyUI(fluidPage(
                   selectInput(
                     inputId = "conti_pick",
                     label = "Plot Options",
-                    choices = c(
+                    choices = c("-" = "-",
                                 "Area Plot" = "geom_area_one",
                                 "Density Plot" = "geom_density",
                                 "Dot Plot" = "geom_dotplot",
@@ -128,7 +128,7 @@ ui <- shinyUI(fluidPage(
                   selectInput(
                     inputId = "disct_pick",
                     label = "Plot Options",
-                    choices = c(
+                    choices = c("-" = "-",
                                 "Bar Plot" = "geom_bar"
                     )
                   )
@@ -141,7 +141,7 @@ ui <- shinyUI(fluidPage(
                   selectInput(
                     inputId = "both_conti_pick",
                     label = "Plot Options",
-                    choices = c(
+                    choices = c("-" = "-",
                                 "Label" = "geom_label",
                                 "Point" = "geom_point",
                                 "Quantile" = "geom_quantile",
@@ -157,7 +157,7 @@ ui <- shinyUI(fluidPage(
                   selectInput(
                     inputId = "one_dist_one_pick",
                     label = "Plot Options",
-                    choices = c(
+                    choices = c("-" = "-",
                                 "Col" = "geom_col",
                                 "Boxplot" = "geom_boxplot", 
                                 "Dotplot" = "goem_dotplot",
@@ -171,7 +171,7 @@ ui <- shinyUI(fluidPage(
                   selectInput(
                     inputId = "both_dist_pick",
                     label = "Plot Options",
-                    choices = c(
+                    choices = c("-" = "-",
                                 "Count" = "geom_count",
                                 "Jitter" = "geom_jitter"
                     )
@@ -183,7 +183,7 @@ ui <- shinyUI(fluidPage(
                   selectInput(
                     inputId = "conti_bivar_dist_pick",
                     label = "Plot Options",
-                    choices = c(
+                    choices = c("-" = "-",
                                 "bin2d" = "geom_bin2d",
                                 "desity 2d" = "geom_desity_2d",
                                 "hex" = "geom_hex"
@@ -196,7 +196,7 @@ ui <- shinyUI(fluidPage(
                   selectInput(
                     inputId = "conti_func_pick",
                     label = "Plot Options",
-                    choices = c(
+                    choices = c("-" = "-",
                                 "area" = "geom_area_two",
                                 "line" = "geom_line",
                                 "step" = "geom_step"
@@ -209,7 +209,7 @@ ui <- shinyUI(fluidPage(
                   selectInput(
                     inputId = "maps_pick",
                     label = "Plot Options",
-                    choices = c(
+                    choices = c("-" = "-",
                                 "maps" = "geom_map"
                     )
                   )
@@ -275,9 +275,12 @@ server <- shinyServer(function(input, output, session) {
     
     return(df)
   })
+  
+  ## Showing Raw Data Summary
   output$summary <- renderPrint({
     summary(data())
   })
+  
   ## Showing Raw Data Table
   output$table <- DT::renderDataTable({
     dat <- data()
@@ -292,27 +295,40 @@ server <- shinyServer(function(input, output, session) {
     ### Important for updating the layout
     ### we need to reinitialize the dataset
     dat <- data()[, c(input$xcol, input$ycol, input$zcol)]
-
+    #print(input$conti_pick)
+    #print(input$disct_pick)
     ### ONE VARIABLE
     ## conti
-    if (input$conti_pick=="geom_histogram"){ # geom_histogram
-      ggplot(dat, aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
-    } else if (input$conti_pick=="geom_density"){ # geom_density
-      ggplot(dat, aes_string(x=input$xcol))+geom_density(colour='darkblue')
-    } else if (input$conti_pick=="geom_area_one") { # geom_area_one
-      ggplot(dat, aes_string(x=input$xcol))+geom_area(stat="bin")
-    } else if (input$conti_pick=="geom_dotplot") { # geom_dotplot
-       ggplot(dat, aes_string(x=input$xcol))+geom_dotplot()
-    } else if (input$conti_pick=="geom_freqpoly") { # geom_freqpoly
-       ggplot(dat, aes_string(x=input$xcol))+geom_freqpoly()
-    } else if (input$conti_pick=="geom_qq") { # geom_qq
-       ggplot(dat, aes_string(sample=input$xcol))+stat_qq()
-    }  
+    conti <- input$conti_pick
+    disct <- input$disct_pick 
+    if (input$n_var=="one_var"&&input$one_var_pick=="conti"){
+      if (conti=="geom_histogram"){ # geom_histogram
+        ggplot(dat, aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
+      } else if (conti=="geom_density"){ # geom_density
+        ggplot(dat, aes_string(x=input$xcol))+geom_density(colour='darkblue')
+      } else if (conti=="geom_area_one") { # geom_area_one
+        ggplot(dat, aes_string(x=input$xcol))+geom_area(stat="bin")
+      } else if (conti=="geom_dotplot") { # geom_dotplot
+         ggplot(dat, aes_string(x=input$xcol))+geom_dotplot()
+      } else if (conti=="geom_freqpoly") { # geom_freqpoly
+         ggplot(dat, aes_string(x=input$xcol))+geom_freqpoly()
+      } else if (conti=="geom_qq") { # geom_qq
+         ggplot(dat, aes_string(sample=input$xcol))+stat_qq()
+      } 
+    } else if (input$n_var=="one_var"&&input$one_var_pick=="disct") {
+      if (disct=="geom_bar"){ ## disct # geom_bar
+        ggplot(dat, aes_string(x=input$xcol))+geom_bar()
+      }
+    }
+    # 
+     
     
-    # print(input$disct_pick)
-    # if (input$disct_pick=="geom_bar"){ ## disct # geom_bar
-    #   ggplot(dat, aes_string(x=input$xcol))+geom_bar()
-    # }
+    
+    
+   
+
+    # 
+    
     
     
     
