@@ -311,6 +311,8 @@ ui <- shinyUI(fluidPage(
 server <- shinyServer(function(input, output, session) {
   ## added "session" because updateSelectInput requires it
   
+  dataUpdate <- reactiveVal()
+  
   ## Initialize the dataset
   data <- reactive({ 
     req(input$file1) ## ?req #  require that the input is available
@@ -337,13 +339,24 @@ server <- shinyServer(function(input, output, session) {
     return(df)
   })
   
+  #dataUpdate <- observe({
+  #  dat <- data()
+  #  return(dat)
+  #})
+  
   ## Showing Raw Data Summary
   output$summary <- renderPrint({
+    if(is.null(data())){
+      return ()
+      }
     summary(data())
   })
   
   ## 
   output$datainfo <- renderPrint({
+    if(is.null(data())){
+      return ()
+      }
     str(data())
   })
   
@@ -357,13 +370,14 @@ server <- shinyServer(function(input, output, session) {
   })
   
   observeEvent(input$impute, {
-    dat <- data()
-    if (!is.null(dat)){
-      if (input$impute=="rmv"){
-        dat <- na.omit(dat)
-      } 
-      data(dat)
+    dataUpdate <- data()
+    if (input$impute=="rmv"){
+      print(na.omit(dataUpdate))
+      #dat <- na.omit(dat)
+    } else if (input$impute=="avg") {
+      print(dataUpdate[is.na(dataUpdate)] <- 0)
     }
+    #data(dat)
     # print(input$impute)
   })
   
