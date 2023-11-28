@@ -47,6 +47,31 @@ ui <- shinyUI(fluidPage(
              )
     ),
     ###################################################################################################
+    ## Tabs
+    tabPanel("Data Preprocessing",
+             titlePanel("Preprocess"),
+               sidebarLayout(
+                 sidebarPanel(
+                   radioButtons('impute', 'Impute Missing Value',
+                                c("Average/Most Frequent"="avg",
+                                  "Replace with Random Value"="rplc",
+                                  "Remove row with missing values"="rmv"
+                                ),
+                                '"'),
+                   radioButtons('norm', 'Normalize',
+                                c("Standardize"="std",
+                                  "Normalize to interval [-1, 1]"="normin"
+                                ),
+                                '"'),
+                   
+                 ),
+                 mainPanel(
+                   verbatimTextOutput("datainfo")
+                   
+        )
+      )
+    ),
+    ###################################################################################################
     tabPanel("Visualize in ggplot", ## First Type
              pageWithSidebar(
                headerPanel('Plots'),
@@ -317,6 +342,11 @@ server <- shinyServer(function(input, output, session) {
     summary(data())
   })
   
+  ## 
+  output$datainfo <- renderPrint({
+    str(data())
+  })
+  
   ## Showing Raw Data Table
   output$table <- DT::renderDataTable({
     dat <- data()
@@ -325,6 +355,34 @@ server <- shinyServer(function(input, output, session) {
     })
     return(dat)
   })
+  
+  observeEvent(input$impute, {
+    dat <- data()
+    if (!is.null(dat)){
+      if (input$impute=="rmv"){
+        dat <- na.omit(dat)
+      } 
+      data(dat)
+    }
+    # print(input$impute)
+  })
+  
+  # observeEvent(input$norm, {
+  #   print(input$norm)
+  #   if (input$norm=="std"){
+      
+  #   } else if (input$norm=="normin") {
+       
+  #   }
+  # })
+  #test <- reactive({
+  #  if (input$impute=="avg"){
+  #    print("Average selected")
+  #  } else if (input$impute=="rplc") {
+  #    print("Replace Random Value selected")
+  #  }
+  #})
+  #test()
   
   ## For Plotting
   output$MyPlot <- renderPlot({
