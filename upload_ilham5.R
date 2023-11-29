@@ -52,20 +52,20 @@ ui <- shinyUI(fluidPage(
              titlePanel("Preprocess"),
                sidebarLayout(
                  sidebarPanel(
-                   tags$strong("test"),
-                   radioButtons('impute', 'Impute Missing Value',
-                                c("Average/Most Frequent"="avg",
-                                  "Replace with Zero"="rplc",
-                                  "Remove row with missing values"="rmv"
-                                ),
-                                '"'),
-                   radioButtons('norm', 'Normalize',
-                                c("Standardize"="std",
-                                  "Normalize to interval [-1, 1]"="normin"
-                                ),
-                                '"'),
-                   actionButton("resetData", "Reset Dataset"
-                   ),
+                   tags$strong("Impute Missing Value"),
+                   tags$br(),
+                   actionButton("avg", "Average/Most Frequent"),
+                   actionButton("rplc", "Replace with Zero"),
+                   actionButton("rmv", "Remove row with missing values"),
+                   tags$br(),
+                   tags$strong("Normalize"),
+                   tags$br(),
+                   actionButton("std", "Normalize to interval [-1, 1]"),
+                   actionButton("normin", "Standardize"),
+                   tags$br(),
+                   tags$strong("Data Reset"),
+                   tags$br(),
+                   actionButton("resetData", "Reset Dataset"),
                  ),
                  mainPanel(
                    verbatimTextOutput("datainfo")
@@ -363,16 +363,24 @@ server <- shinyServer(function(input, output, session) {
     return(dat)
   })
   
-  observeEvent(input$impute, {
+  observeEvent(input$rmv, {
     dataUpdate <- data()
-    if (input$impute=="rmv"){
-      dataUpdate <- na.omit(dataUpdate)
-    } else if (input$impute=="rplc") {
-      dataUpdate[is.na(dataUpdate)] <- 0
-    }
+    dataUpdate <- na.omit(dataUpdate)
     data(dataUpdate)
-    #data(dat)
-    # print(input$impute)
+  })
+  
+  observeEvent(input$rplc, {
+    dataUpdate <- data()
+    dataUpdate <- dataUpdate[is.na(dataUpdate)] <- 0
+    data(dataUpdate)
+  })
+  
+  observeEvent(input$std, {
+
+  })
+
+  observeEvent(input$normin, {
+    
   })
   
   # observeEvent(input$norm, {

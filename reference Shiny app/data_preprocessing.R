@@ -23,3 +23,9 @@ for (col in colnames(data)) {
   #print(col)
   data$col[is.na(data$col)] <- mean(data$col, na.rm=T) 
 }
+
+library(dplyr)
+
+## standardize all variables
+rmchar <- data[, !sapply(data, is.character)]
+df2 <- rmchar %>% mutate_all(~(scale(.) %>% as.vector))
