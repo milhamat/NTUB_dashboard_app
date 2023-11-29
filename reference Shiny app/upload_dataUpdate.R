@@ -27,6 +27,7 @@ server <- shinyServer(function(input,output){
     inFile <- input$file1 
     dat <- read.csv(inFile$datapath)
     data(dat)
+    print(names(dat))
   })
   
   observeEvent(input$convert_button, {

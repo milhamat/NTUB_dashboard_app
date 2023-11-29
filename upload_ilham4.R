@@ -311,18 +311,16 @@ ui <- shinyUI(fluidPage(
 server <- shinyServer(function(input, output, session) {
   ## added "session" because updateSelectInput requires it
   
-  dataUpdate <- reactiveVal()
+  data <- reactiveVal()
   
-  ## Initialize the dataset
-  data <- reactive({ 
-    req(input$file1) ## ?req #  require that the input is available
-    
-    inFile <- input$file1 
-    
+  ### Initialize the dataset
+  observeEvent(input$file1, ignoreNULL=T, ignoreInit=T,{
+    req(input$file1)
+    inFile <- input$file1
     df <- read.csv(inFile$datapath, header = input$header, sep = input$sep,
-                   quote = input$quote)
-    
-    ## For updating the x and y axis feature 
+                    quote = input$quote)
+    data(df)
+    # For updating the x and y axis feature 
     updateSelectInput(session, inputId = 'xcol', label = 'X Variable',
                       choices = names(df), selected = names(df)[1])
     updateSelectInput(session, inputId = 'ycol', label = 'Y Variable',
@@ -334,15 +332,7 @@ server <- shinyServer(function(input, output, session) {
     updateSelectInput(session, inputId = 'ymax', label = 'Ymax',
                       choices = names(df), selected = names(df)[1])
     #choices = names(df), selected = names(df)[2])
-    #print(df)
-    
-    return(df)
   })
-  
-  #dataUpdate <- observe({
-  #  dat <- data()
-  #  return(dat)
-  #})
   
   ## Showing Raw Data Summary
   output$summary <- renderPrint({
@@ -372,11 +362,12 @@ server <- shinyServer(function(input, output, session) {
   observeEvent(input$impute, {
     dataUpdate <- data()
     if (input$impute=="rmv"){
-      print(na.omit(dataUpdate))
-      #dat <- na.omit(dat)
+      # print(na.omit(dataUpdate))
+      dataUpdate <- na.omit(dataUpdate)
     } else if (input$impute=="avg") {
       print(dataUpdate[is.na(dataUpdate)] <- 0)
     }
+    data(dataUpdate)
     #data(dat)
     # print(input$impute)
   })
@@ -389,14 +380,6 @@ server <- shinyServer(function(input, output, session) {
        
   #   }
   # })
-  #test <- reactive({
-  #  if (input$impute=="avg"){
-  #    print("Average selected")
-  #  } else if (input$impute=="rplc") {
-  #    print("Replace Random Value selected")
-  #  }
-  #})
-  #test()
   
   ## For Plotting
   output$MyPlot <- renderPlot({
