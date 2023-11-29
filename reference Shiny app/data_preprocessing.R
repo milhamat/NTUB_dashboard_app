@@ -22,10 +22,10 @@ valcnt <- sum(is.na(data))
 print(paste0("total missing value: ", valcnt))
 data$mxPH[is.na(data$mxPH)] <- mean(data$mxPH, na.rm = TRUE)
 
-for (col in colnames(data)) {
-  #print(col)
-  data$col[is.na(data$col)] <- mean(data$col, na.rm=T) 
-}
+#for (col in colnames(data)) {
+#  print(col)
+#  data$col[is.na(data$col)] <- mean(data$col, na.rm=T) 
+#}
 
 library(dplyr)
 
@@ -37,7 +37,8 @@ typeof(df)
 typeof(df2)
 typeof(data)
 df2[names(df)] <- df
-
+df2
+data <- df2
 ## remove with zero
 data[is.na(data)] <- 0
 data

@@ -114,8 +114,6 @@ ui <- shinyUI(fluidPage(
                                 "Both Discrete" = "both_dist",
                                 "Continuous Bivariate distribution" = "conti_bivar_dist",
                                 "Continuous Function" = "conti_func",
-                                "Visualizing Error" = "vis_err",
-                                "Maps" = "maps"
                     )
                   )
                 ),
@@ -171,12 +169,10 @@ ui <- shinyUI(fluidPage(
                     inputId = "both_conti_pick",
                     label = "Plot Options",
                     choices = c("-" = "-",
-                                "Label" = "geom_label",
                                 "Point" = "geom_point",
                                 "Quantile" = "geom_quantile",
                                 "Rug" = "geom_rug",
-                                "Smooth" = "smooth",
-                                "Text" = "geom_text"
+                                "Smooth" = "smooth"
                     )
                   )
                 ),
@@ -188,8 +184,7 @@ ui <- shinyUI(fluidPage(
                     label = "Plot Options",
                     choices = c("-" = "-",
                                 "Col" = "geom_col",
-                                "Boxplot" = "geom_boxplot", 
-                                "Dotplot" = "goem_dotplot",
+                                "Boxplot" = "geom_boxplot",
                                 "Violin" = "geom_violin"
                     )
                   )
@@ -215,7 +210,6 @@ ui <- shinyUI(fluidPage(
                     choices = c("-" = "-",
                                 "Bin2d" = "geom_bin2d",
                                 "Desity 2d" = "geom_desity_2d",
-                                "Hex" = "geom_hex"
                     )
                   )
                 ),
@@ -229,31 +223,6 @@ ui <- shinyUI(fluidPage(
                                 "Area" = "geom_area_two",
                                 "Line" = "geom_line",
                                 "Step" = "geom_step"
-                    )
-                  )
-                ),
-                ## Vis Error
-                conditionalPanel(
-                  condition = "input.two_var_pick == 'vis_err' && input.n_var != 'one_var' && input.n_var != 'three_var'",
-                  selectInput(
-                    inputId = "vis_err_pick",
-                    label = "Plot Options",
-                    choices = c("-" = "-",
-                                "Cross Bar" = "geom_crossbar",
-                                "Error Bar" = "geom_errorbar",
-                                "Line Range" = "geom_linerange",
-                                "Point Range" = "geom_pointrange"
-                    )
-                  )
-                ),
-                ## maps
-                conditionalPanel(
-                  condition = "input.two_var_pick == 'maps' && input.n_var != 'one_var' && input.n_var != 'three_var'",
-                  selectInput(
-                    inputId = "maps_pick",
-                    label = "Plot Options",
-                    choices = c("-" = "-",
-                                "Maps" = "geom_map"
                     )
                   )
                 ),
@@ -315,7 +284,7 @@ ui <- shinyUI(fluidPage(
 server <- shinyServer(function(input, output, session) {
   ## added "session" because updateSelectInput requires it
   
-  data <- reactiveVal()
+  dat <- reactiveVal()
   OriginalData <- reactiveVal()
   
   ## Initialize the dataset
@@ -328,7 +297,7 @@ server <- shinyServer(function(input, output, session) {
     inFile <- input$file1
     df <- read.csv(inFile$datapath, header = input$header, sep = input$sep,
                     quote = input$quote)
-    data(df)
+    dat(df)
     OriginalData(df)
     # For updating the x and y axis feature 
     updateSelectInput(session, inputId = 'xcol', label = 'X Variable',
@@ -346,49 +315,49 @@ server <- shinyServer(function(input, output, session) {
   
   ## Showing Raw Data Summary
   output$summary <- renderPrint({
-    if(is.null(data())){
+    if(is.null(dat())){
       return ()
       }
-    summary(data())
+    summary(dat())
   })
   
   ## 
   output$datainfo <- renderPrint({
-    if(is.null(data())){
+    if(is.null(dat())){
       return ()
       }
-    str(data())
+    str(dat())
   })
   
   ## Showing Raw Data Table
   output$table <- DT::renderDataTable({
-    dat <- data()
+    datt <- dat()
     tryCatch({
-      dat
+      datt
     })
-    return(dat)
+    return(datt)
   })
   
   observeEvent(input$rmv, {
-    dataUpdate <- data()
+    dataUpdate <- dat()
     dataUpdate <- na.omit(dataUpdate)
-    data(dataUpdate)
+    dat(dataUpdate)
     print(typeof(dataUpdate))
   })
   
   observeEvent(input$rplc, {
-    dataUpdate <- data()
+    dataUpdate <- dat()
     dataUpdate[is.na(dataUpdate)] <- 0
-    data(dataUpdate)
+    dat(dataUpdate)
   })
   
   observeEvent(input$std, {
-    # rmchar <- data[, !sapply(data, is.character)]
-    # df <- data[, sapply(data, is.character)]
-    # df2 <- rmchar %>% mutate_all(~(scale(.) %>% as.vector))
-    # df2[names(df)] <- df
-    # data(df2)
-    print(typeof(data()))
+    rmchar <- dat[, !sapply(dat, is.character)]
+    df <- dat[, sapply(dat, is.character)]
+    df2 <- rmchar %>% mutate_all(~(scale(.) %>% as.vector))
+    df2[names(df)] <- df
+    dat <- df2
+    # print(typeof(data()))
   })
 
   observeEvent(input$normin, {
@@ -406,11 +375,11 @@ server <- shinyServer(function(input, output, session) {
   
   observeEvent(input$resetData, {
     # for resetting the dataset
-    data(OriginalData())
+    dat(OriginalData())
   })
   
   output$miss <- renderText({
-    valcnt <- sum(is.na(data()))
+    valcnt <- sum(is.na(dat()))
     paste0("total missing value: ", valcnt)
   })
   
@@ -418,123 +387,78 @@ server <- shinyServer(function(input, output, session) {
   output$MyPlot <- renderPlot({
     ### Important for updating the layout
     ### we need to reinitialize the dataset
-    dat <- data()[, c(input$xcol, input$ycol, input$zcol)]
+    datt <- dat()[, c(input$xcol, input$ycol, input$zcol)]
     ### ONE VARIABLE
     ## conti
     conti <- input$conti_pick
     disct <- input$disct_pick 
     if (input$n_var=="one_var"&&input$one_var_pick=="conti"){
       if (conti=="geom_histogram"){ # geom_histogram
-        ggplot(dat, aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
+        ggplot(datt, aes_string(x=input$xcol))+geom_histogram(colour='darkblue')
       } else if (conti=="geom_density"){ # geom_density
-        ggplot(dat, aes_string(x=input$xcol))+geom_density(colour='darkblue')
+        ggplot(datt, aes_string(x=input$xcol))+geom_density(colour='darkblue')
       } else if (conti=="geom_area_one") { # geom_area_one
-        ggplot(dat, aes_string(x=input$xcol))+geom_area(stat="bin")
+        ggplot(datt, aes_string(x=input$xcol))+geom_area(stat="bin")
       } else if (conti=="geom_dotplot") { # geom_dotplot
-         ggplot(dat, aes_string(x=input$xcol))+geom_dotplot()
+         ggplot(datt, aes_string(x=input$xcol))+geom_dotplot()
       } else if (conti=="geom_freqpoly") { # geom_freqpoly
-         ggplot(dat, aes_string(x=input$xcol))+geom_freqpoly()
+         ggplot(datt, aes_string(x=input$xcol))+geom_freqpoly()
       } else if (conti=="geom_qq") { # geom_qq
-         ggplot(dat, aes_string(sample=input$xcol))+stat_qq()
+         ggplot(datt, aes_string(sample=input$xcol))+stat_qq()
       } 
     } else if (input$n_var=="one_var"&&input$one_var_pick=="disct") {
       if (disct=="geom_bar"){ ## disct # geom_bar
-        ggplot(dat, aes_string(x=input$xcol))+geom_bar()
+        ggplot(datt, aes_string(x=input$xcol))+geom_bar()
       }
     } else if (input$n_var=="two_var"&&input$two_var_pick=="both_conti"){
       if (input$both_conti_pick=="geom_point"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
-      } else if (input$both_conti_pick=="geom_label"){
-        ggplot(dat, aes(x=input$xcol, y=input$ycol, label=rownames(dat)))+geom_label() #NO
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_point(colour='darkblue')
       } else if (input$both_conti_pick=="geom_quantile") {
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_quantile()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_quantile()
       } else if (input$both_conti_pick=="geom_rug"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_rug(sides = "bl")
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_rug(sides = "bl")
       } else if (input$both_conti_pick=="smooth"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_smooth()
-      } else if (input$both_conti_pick=="geom_text"){
-        ggplot(dat, aes(x=input$xcol, y=input$ycol, label=rownames(dat)))+geom_text() #NO
-      }
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_smooth()
+      } 
     } else if (input$n_var=="two_var"&&input$two_var_pick=="one_dist_one_conti"){
       if (input$one_dist_one_pick=="geom_boxplot"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_boxplot()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_boxplot()
       } else if (input$one_dist_one_pick=="geom_violin"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_violin()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_violin()
       } else if (input$one_dist_one_pick=="geom_col"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_col()
-      } else if (input$one_dist_one_pick=="geom_dotplot"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_dotplot(binaxis = "y", stackdir = "center") #NO
-      }
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_col()
+      } 
     } else if (input$n_var=="two_var"&&input$two_var_pick=="both_dist"){
       if (input$both_dist_pick=="geom_count"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_count()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_count()
       } else if (input$both_dist_pick=="geom_jitter"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_jitter()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_jitter()
       }
     } else if (input$n_var=="two_var"&&input$two_var_pick=="conti_bivar_dist"){
       if (input$conti_bivar_dist_pick=="geom_bin2d"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_bin_2d()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_bin_2d()
       } else if (input$conti_bivar_dist_pick=="geom_desity_2d"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_density_2d()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_density_2d()
       } 
-      #else if (input$conti_bivar_dist_pick=="geom_hex"){
-        #ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_hex() #NO
-      #}
     } else if (input$n_var=="two_var"&&input$two_var_pick=="conti_func"){
       if (input$conti_func_pick=="geom_area_two"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_area()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_area()
       } else if (input$conti_func_pick=="geom_line"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_line()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_line()
       } else if (input$conti_func_pick=="geom_step"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_step()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol))+geom_step()
       }
-    } else if (input$n_var=="two_var"&&input$two_var_pick=="vis_err") {
-       if (input$vis_err_pick=="geom_crossbar") {
-         ggplot(dat, aes_string(x=input$xcol, y=input$ycol, ymin=input$ymin, ymax=input$ymax))+geom_crossbar(fatten=1)
-       } else if (input$vis_err_pick=="geom_errorbar") {
-         ggplot(dat, aes_string(x=input$xcol, y=input$ycol, ymin=input$ymin, ymax=input$ymax))+geom_errorbar()
-       } else if (input$vis_err_pick=="geom_linerange") {
-         ggplot(dat, aes_string(x=input$xcol, y=input$ycol, ymin=input$ymin, ymax=input$ymax))+geom_linerange()
-       } else if (input$vis_err_pick=="geom_pointrange") {
-         ggplot(dat, aes_string(x=input$xcol, y=input$ycol, ymin=input$ymin, ymax=input$ymax))+geom_pointrange()
-       }
-    } else if (input$n_var=="two_var"&&input$two_var_pick=="maps"){
-      print("Maps")
-      #if (input$maps_pick=="geom_map"){
-        #ggplot(dat, aes_string(x=input$xcol, y=input$ycol))+geom_map() #NO
-      #}
-    } else if (input$n_var=="three_var"){
+    }  else if (input$n_var=="three_var"){
       if (input$three_var_pick=="geom_contour"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_contour()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_contour()
       } else if (input$three_var_pick=="geom_contour_filled"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_contour_filled()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_contour_filled()
       } else if (input$three_var_pick=="geom_raster"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_raster()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_raster()
       } else if (input$three_var_pick=="geom_tile"){
-        ggplot(dat, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_tile()
+        ggplot(datt, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_tile()
       }
     }
-    
-    #NOTE
-    ### TWO VARIABLE
-    ## both_conti_pick
-    # geom_label NO
-    # geom_text NO
-    
-    ## one_dist_one_pick
-    # geom_dotplot NO
-  
-    ## conti_bivar_dist_pick
-    # geom_hex NO
-
-    ## maps_pick
-    # geom_map NO
-
-    # geom_crossbar NO
-    # geom_errorbar NO
-    # geom_linerange NO
-    # geom_pointrange NO
-
   } ,height = 400, width = 600
   )
   
