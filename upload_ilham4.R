@@ -316,9 +316,13 @@ server <- shinyServer(function(input, output, session) {
   data <- reactiveVal()
   OriginalData <- reactiveVal()
   
-  ### Initialize the dataset
-  observeEvent(input$file1, ignoreNULL=T, ignoreInit=T,{
-    req(input$file1)
+  ## Initialize the dataset
+  datainlist <- reactive({
+    list(input$file1, input$header, input$sep, input$quote)
+  })
+
+  observeEvent(datainlist(), ignoreNULL=T, ignoreInit=T, {
+    
     inFile <- input$file1
     df <- read.csv(inFile$datapath, header = input$header, sep = input$sep,
                     quote = input$quote)

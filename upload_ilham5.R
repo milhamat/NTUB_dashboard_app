@@ -1,6 +1,7 @@
 library(shiny)
 library(datasets)
 library(ggplot2)
+library(dplyr)
 ###################################################################################################
 ui <- shinyUI(fluidPage(
   ## Title
@@ -60,8 +61,8 @@ ui <- shinyUI(fluidPage(
                    tags$br(),
                    tags$strong("Normalize"),
                    tags$br(),
-                   actionButton("std", "Normalize to interval [-1, 1]"),
-                   actionButton("normin", "Standardize"),
+                   actionButton("normin", "Normalize to interval [-1, 1]"),
+                   actionButton("std", "Standardize"),
                    tags$br(),
                    tags$strong("Data Reset"),
                    tags$br(),
@@ -317,8 +318,11 @@ server <- shinyServer(function(input, output, session) {
   OriginalData <- reactiveVal()
   
   ### Initialize the dataset
-  observeEvent(input$file1, ignoreNULL=T, ignoreInit=T,{
+  observeEvent(input$file1, ignoreNULL=T,{
     req(input$file1)
+    req(input$header)
+    req(input$sep)
+    req(input$quote)
     inFile <- input$file1
     df <- read.csv(inFile$datapath, header = input$header, sep = input$sep,
                     quote = input$quote)
@@ -376,7 +380,12 @@ server <- shinyServer(function(input, output, session) {
   })
   
   observeEvent(input$std, {
-
+    # rmchar <- data[, !sapply(data, is.character)]
+    # df <- data[, sapply(data, is.character)]
+    # df2 <- rmchar %>% mutate_all(~(scale(.) %>% as.vector))
+    # df2[names(df)] <- df
+    # data(df2)
+    print(typeof(data()))
   })
 
   observeEvent(input$normin, {

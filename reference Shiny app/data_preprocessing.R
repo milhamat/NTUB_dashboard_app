@@ -29,3 +29,8 @@ library(dplyr)
 ## standardize all variables
 rmchar <- data[, !sapply(data, is.character)]
 df2 <- rmchar %>% mutate_all(~(scale(.) %>% as.vector))
+df <- data[, sapply(data, is.character)]
+typeof(df)
+typeof(df2)
+typeof(data)
+df2[names(df)] <- df
