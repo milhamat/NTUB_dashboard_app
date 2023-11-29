@@ -16,7 +16,10 @@ df1[idx] <- (df1[idx-1] + df1[idx+1])/2
 df1
 ###############
 data <- read.csv("./datatests/algae.csv")
-
+data
+sum(is.na(data))
+valcnt <- sum(is.na(data))
+print(paste0("total missing value: ", valcnt))
 data$mxPH[is.na(data$mxPH)] <- mean(data$mxPH, na.rm = TRUE)
 
 for (col in colnames(data)) {
@@ -34,3 +37,7 @@ typeof(df)
 typeof(df2)
 typeof(data)
 df2[names(df)] <- df
+
+## remove with zero
+data[is.na(data)] <- 0
+data

@@ -69,6 +69,7 @@ ui <- shinyUI(fluidPage(
                    actionButton("resetData", "Reset Dataset"),
                  ),
                  mainPanel(
+                   textOutput("miss"),
                    verbatimTextOutput("datainfo")
                    
         )
@@ -317,12 +318,13 @@ server <- shinyServer(function(input, output, session) {
   data <- reactiveVal()
   OriginalData <- reactiveVal()
   
-  ### Initialize the dataset
-  observeEvent(input$file1, ignoreNULL=T,{
-    req(input$file1)
-    req(input$header)
-    req(input$sep)
-    req(input$quote)
+  ## Initialize the dataset
+  datainlist <- reactive({
+    list(input$file1, input$header, input$sep, input$quote)
+  })
+
+  observeEvent(datainlist(), ignoreNULL=T, ignoreInit=T, {
+    
     inFile <- input$file1
     df <- read.csv(inFile$datapath, header = input$header, sep = input$sep,
                     quote = input$quote)
@@ -371,11 +373,12 @@ server <- shinyServer(function(input, output, session) {
     dataUpdate <- data()
     dataUpdate <- na.omit(dataUpdate)
     data(dataUpdate)
+    print(typeof(dataUpdate))
   })
   
   observeEvent(input$rplc, {
     dataUpdate <- data()
-    dataUpdate <- dataUpdate[is.na(dataUpdate)] <- 0
+    dataUpdate[is.na(dataUpdate)] <- 0
     data(dataUpdate)
   })
   
@@ -404,6 +407,11 @@ server <- shinyServer(function(input, output, session) {
   observeEvent(input$resetData, {
     # for resetting the dataset
     data(OriginalData())
+  })
+  
+  output$miss <- renderText({
+    valcnt <- sum(is.na(data()))
+    paste0("total missing value: ", valcnt)
   })
   
   ## For Plotting
