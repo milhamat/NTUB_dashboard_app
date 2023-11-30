@@ -113,7 +113,7 @@ ui <- shinyUI(fluidPage(
                                 "One Discrete, one continuous" = "one_dist_one_conti",
                                 "Both Discrete" = "both_dist",
                                 "Continuous Bivariate distribution" = "conti_bivar_dist",
-                                "Continuous Function" = "conti_func",
+                                "Continuous Function" = "conti_func"
                     )
                   )
                 ),
@@ -209,7 +209,7 @@ ui <- shinyUI(fluidPage(
                     label = "Plot Options",
                     choices = c("-" = "-",
                                 "Bin2d" = "geom_bin2d",
-                                "Desity 2d" = "geom_desity_2d",
+                                "Desity 2d" = "geom_desity_2d"
                     )
                   )
                 ),
@@ -268,6 +268,9 @@ ui <- shinyUI(fluidPage(
                                 selected = ""
                     )
                   ),
+                tags$br(),
+                tags$p(strong("Download Plot as png")),
+                downloadButton("savePlot", "Save Plot")
                ),
                ################
                mainPanel(
@@ -282,6 +285,7 @@ ui <- shinyUI(fluidPage(
  )
 ###################################################################################################
 server <- shinyServer(function(input, output, session) {
+  options(shiny.maxRequestSize=30*1024^2)
   ## added "session" because updateSelectInput requires it
   
   dat <- reactiveVal()
@@ -352,26 +356,23 @@ server <- shinyServer(function(input, output, session) {
   })
   
   observeEvent(input$std, {
-    rmchar <- dat[, !sapply(dat, is.character)]
-    df <- dat[, sapply(dat, is.character)]
-    df2 <- rmchar %>% mutate_all(~(scale(.) %>% as.vector))
-    df2[names(df)] <- df
-    dat <- df2
+    dataUpdate <- dat()
+    for (i in 1:ncol(dataUpdate)){
+      dataUpdate[is.na(dataUpdate[,i]), i] <- mean(dataUpdate[, i], na.rm=T)
+    }
+    #print(dataUpdate)
+    dat(dataUpdate)
+    # rmchar <- dat[, !sapply(dat, is.character)]
+    # df <- dat[, sapply(dat, is.character)]
+    # df2 <- rmchar %>% mutate_all(~(scale(.) %>% as.vector))
+    # df2[names(df)] <- df
+    # dat <- df2
     # print(typeof(data()))
   })
 
   observeEvent(input$normin, {
     
   })
-  
-  # observeEvent(input$norm, {
-  #   print(input$norm)
-  #   if (input$norm=="std"){
-      
-  #   } else if (input$norm=="normin") {
-       
-  #   }
-  # })
   
   observeEvent(input$resetData, {
     # for resetting the dataset
@@ -460,6 +461,17 @@ server <- shinyServer(function(input, output, session) {
       }
     }
   } ,height = 400, width = 600
+  )
+  
+  output$savePlot <- downloadHandler(
+    filename = "plot.png",
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = width, height = height,
+                       res = 300, units = "in") 
+      }
+      ggsave(file, plot = plotInput(), device = device)
+    }
   )
   
 })
