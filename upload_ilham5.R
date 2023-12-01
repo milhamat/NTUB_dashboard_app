@@ -276,8 +276,8 @@ ui <- shinyUI(fluidPage(
                     )
                   ),
                 tags$br(),
-                tags$p(strong("Download Plot as png")),
-                downloadButton("savePlot", "Save Plot")
+                tags$p(strong("Download Plot as png"))#,
+                # downloadButton("savePlot", "Save Plot")
                ),
                ################
                mainPanel(
@@ -476,20 +476,24 @@ server <- shinyServer(function(input, output, session) {
         ggplot(datt, aes_string(x=input$xcol, y=input$ycol, z=input$zcol))+geom_tile()
       }
     }
-  } ,height = 400, width = 600
+  } #,height = 400, width = 600
   )
   
-  output$savePlot <- downloadHandler(
-    filename = "plot.png",
-    content = function(file) {
-      device <- function(..., width, height) {
-        grDevices::png(..., width = width, height = height,
-                       res = 300, units = "in") 
-      }
-      ggsave(file, plot = plotInput(), device = device)
-    }
-  )
-  
+  # output$savePlot <- downloadHandler(
+  #   filename = "plot.png",
+  #   content = function(file) {
+  #     device <- function(..., width, height) {
+  #       grDevices::png(..., 
+  #                      width = width, 
+  #                      height = height,
+  #                      res = 300, 
+  #                      units = "in"
+  #                      ) 
+  #     }
+  #     ggsave(file, plot = dat$plot, device = device)
+  #   }
+  # )
 })
+
 ###################################################################################################
 shinyApp(ui, server)
