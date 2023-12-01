@@ -42,3 +42,13 @@ data <- df2
 ## remove with zero
 data[is.na(data)] <- 0
 data
+
+#################
+data <- read.csv("./datatests/algae.csv")
+data2 <- data
+rmchar <- data[, !sapply(data, is.character)]
+scl <- scale(rmchar)
+scl <- data.frame(scl)
+#colMeans(rmchar)
+colnm <- colnames(scl)
+data2[colnm] <- scl[colnm]

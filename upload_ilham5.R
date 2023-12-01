@@ -55,23 +55,29 @@ ui <- shinyUI(fluidPage(
                  sidebarPanel(
                    tags$strong("Impute Missing Value"),
                    tags$br(),
-                   actionButton("avg", "Average/Most Frequent"),
-                   actionButton("rplc", "Replace with Zero"),
-                   actionButton("rmv", "Remove row with missing values"),
+                   actionButton("avg", "Average/Most Frequent",
+                                #style='padding:5px; font-size:100%',
+                                class="btn-block"),
+                   actionButton("rplc", "Replace with Zero",
+                                class="btn-block"),
+                   actionButton("rmv", "Remove row with missing values",
+                                class="btn-block"),
                    tags$br(),
                    tags$strong("Normalize"),
                    tags$br(),
-                   actionButton("normin", "Normalize to interval [-1, 1]"),
-                   actionButton("std", "Standardize"),
+                   actionButton("normin", "Normalize to interval [-1, 1]",
+                                class="btn-block"),
+                   actionButton("std", "Standardize",
+                                class="btn-block"),
                    tags$br(),
                    tags$strong("Data Reset"),
                    tags$br(),
-                   actionButton("resetData", "Reset Dataset"),
+                   actionButton("resetData", "Reset Dataset",
+                                class="btn-block"),
                  ),
                  mainPanel(
                    textOutput("miss"),
                    verbatimTextOutput("datainfo")
-                   
         )
       )
     ),
@@ -341,7 +347,7 @@ server <- shinyServer(function(input, output, session) {
     })
     return(datt)
   })
-  
+  ### Impute Missing Value
   observeEvent(input$rmv, {
     dataUpdate <- dat()
     dataUpdate <- na.omit(dataUpdate)
@@ -355,19 +361,22 @@ server <- shinyServer(function(input, output, session) {
     dat(dataUpdate)
   })
   
-  observeEvent(input$std, {
+  observeEvent(input$avg, {
     dataUpdate <- dat()
     for (i in 1:ncol(dataUpdate)){
       dataUpdate[is.na(dataUpdate[,i]), i] <- mean(dataUpdate[, i], na.rm=T)
     }
-    #print(dataUpdate)
     dat(dataUpdate)
-    # rmchar <- dat[, !sapply(dat, is.character)]
-    # df <- dat[, sapply(dat, is.character)]
-    # df2 <- rmchar %>% mutate_all(~(scale(.) %>% as.vector))
-    # df2[names(df)] <- df
-    # dat <- df2
-    # print(typeof(data()))
+  })
+  ### Normalize
+  observeEvent(input$std, {
+    dataUpdate <- dat()
+    rmchar <- dataUpdate[, !sapply(dataUpdate, is.character)]
+    scl <- scale(rmchar)
+    scl <- data.frame(scl)
+    colnm <- colnames(scl)
+    dataUpdate[colnm] <- scl[colnm]
+    dat(dataUpdate)
   })
 
   observeEvent(input$normin, {
