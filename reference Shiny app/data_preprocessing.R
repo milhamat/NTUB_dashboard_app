@@ -52,3 +52,14 @@ scl <- data.frame(scl)
 #colMeans(rmchar)
 colnm <- colnames(scl)
 data2[colnm] <- scl[colnm]
+
+#######################
+#normalize 0 to 1
+library(caret)
+data <- read.csv("./datatests/algae.csv")
+data2 <- data
+rmchar <- data[, !sapply(data, is.character)]
+process <- preProcess(as.data.frame(rmchar), method=c("range"))
+norm_scale <- predict(process, as.data.frame(rmchar))
+colnm <- colnames(norm_scale)
+data2[colnm] <- norm_scale[colnm]

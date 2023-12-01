@@ -2,6 +2,7 @@ library(shiny)
 library(datasets)
 library(ggplot2)
 library(dplyr)
+library(caret)
 ###################################################################################################
 ui <- shinyUI(fluidPage(
   ## Title
@@ -40,10 +41,10 @@ ui <- shinyUI(fluidPage(
                ),
                ## Main Panel
                mainPanel(
-                 verbatimTextOutput("summary"),
                  ## Table Out
-                 DT::dataTableOutput("table")
+                 DT::dataTableOutput("table"),
                  #tableOutput('contents')
+                 verbatimTextOutput("summary")
                )
              )
     ),
@@ -65,7 +66,7 @@ ui <- shinyUI(fluidPage(
                    tags$br(),
                    tags$strong("Normalize"),
                    tags$br(),
-                   actionButton("normin", "Normalize to interval [-1, 1]",
+                   actionButton("normlz", "Normalize to interval [0, 1]",
                                 class="btn-block"),
                    actionButton("std", "Standardize",
                                 class="btn-block"),
@@ -379,8 +380,14 @@ server <- shinyServer(function(input, output, session) {
     dat(dataUpdate)
   })
 
-  observeEvent(input$normin, {
-    
+  observeEvent(input$normlz, {
+    dataUpdate <- dat()
+    rmchar <- dataUpdate[, !sapply(dataUpdate, is.character)]
+    process <- preProcess(as.data.frame(rmchar), method=c("range"))
+    norm_scale <- predict(process, as.data.frame(rmchar))
+    colnm <- colnames(norm_scale)
+    dataUpdate[colnm] <- norm_scale[colnm]
+    dat(dataUpdate)
   })
   
   observeEvent(input$resetData, {
