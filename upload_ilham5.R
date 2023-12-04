@@ -14,7 +14,7 @@ ui <- shinyUI(fluidPage(
   ## Tabs
   tabsetPanel(
     ## Tabs panel
-    tabPanel("Raw Data", # Upload File
+    tabPanel("Data Information", # Upload File
              ## Title panel
              titlePanel("Uploading Files"),
              sidebarLayout(
@@ -54,6 +54,8 @@ ui <- shinyUI(fluidPage(
              titlePanel("Preprocess"),
                sidebarLayout(
                  sidebarPanel(
+                   p(strong("Note:"),textOutput("miss")),
+                   #textOutput("miss"),
                    tags$strong("Impute Missing Value"),
                    tags$br(),
                    actionButton("avg", "Average/Most Frequent",
@@ -77,16 +79,17 @@ ui <- shinyUI(fluidPage(
                                 class="btn-block"),
                  ),
                  mainPanel(
-                   textOutput("miss"),
+                   #textOutput("miss"),
                    verbatimTextOutput("datainfo")
         )
       )
     ),
     ###################################################################################################
-    tabPanel("Visualize in ggplot", ## First Type
+    tabPanel("Data Visualization", ## First Type
              pageWithSidebar(
                headerPanel('Plots'),
                sidebarPanel(
+                 #p("Test"),
                  selectInput(
                    inputId = "n_var",
                    label = "How many variable",
