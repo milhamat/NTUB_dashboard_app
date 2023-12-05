@@ -42,8 +42,10 @@ ui <- shinyUI(fluidPage(
                ## Main Panel
                mainPanel(
                  ## Table Out
+                 h4(strong("Observation")),
                  DT::dataTableOutput("table"),
                  #tableOutput('contents')
+                 h4(strong("Summary")),
                  verbatimTextOutput("summary")
                )
              )
@@ -80,6 +82,7 @@ ui <- shinyUI(fluidPage(
                  ),
                  mainPanel(
                    #textOutput("miss"),
+                   h4(strong("Observation")),
                    verbatimTextOutput("datainfo")
         )
       )
