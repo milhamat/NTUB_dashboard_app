@@ -1,5 +1,13 @@
 data <- read.csv("./datatests/algae.csv")
 
+mean(data$"a4") # pointing data column using string
+data[,"a4"]
+data$a4
+mean(data$a4)
+mean(data[,"a4"])
+typeof(data$a4)
+
+
 str(data)
 
 data <- na.omit(data)
