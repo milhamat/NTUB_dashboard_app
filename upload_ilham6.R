@@ -87,8 +87,6 @@ ui <- shinyUI(fluidPage(
                                 class="btn-block"),
                    actionButton("rplc_p", "Replace with Zero",
                                 class="btn-block"),
-                   actionButton("rmv_p", "Remove row with missing values",
-                                class="btn-block"),
 
                    tags$br(),
                    tags$strong("Normalize (partial)"),
@@ -443,22 +441,19 @@ server <- shinyServer(function(input, output, session) {
     dataUpdate <- dat()
     df1 <- na.omit(dataUpdate)
     ft <- input$imptMissVal
-    #print(length(dataUpdate$ft))
     avg <- mean(df1[,ft])
     dataUpdate[,ft][is.na(dataUpdate[,ft])] <- avg
-    #print(length(dataUpdate$ft))
+    
     dat(dataUpdate)
   })
    observeEvent(input$rplc_p, {
     dataUpdate <- dat()
+    ft <- input$imptMissVal
+    dataUpdate[,ft][is.na(dataUpdate[,ft])] <- 0
+    
     dat(dataUpdate)
-    print(input$imptMissVal)
   })
-   observeEvent(input$rmv_p, {
-    dataUpdate <- dat()
-    dat(dataUpdate)
-    print(input$imptMissVal)
-  })
+ 
 
    observeEvent(input$normlz_p, {
     dataUpdate <- dat()
