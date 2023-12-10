@@ -7,6 +7,9 @@ mean(data$a4)
 mean(data[,"a4"])
 typeof(data$a4)
 
+# normalize columns side dataset
+scale(data$a4)
+
 
 str(data)
 

@@ -353,9 +353,11 @@ server <- shinyServer(function(input, output, session) {
     updateSelectInput(session, inputId = 'ymax', label = 'Ymax',
                       choices = names(df), selected = names(df)[1])
     #choices = names(df), selected = names(df)[2])
+    noChar <- df[, !sapply(df, is.character)]
     updateSelectInput(session, inputId = 'norm_p', label = 'select column:',
-                      choices = names(df), selected = names(df)[1])
-    listMiss = names(which(colSums(is.na(df))>0))
+                      choices = names(noChar), selected = names(noChar)[1])
+    
+    listMiss <- names(which(colSums(is.na(df))>0))
     updateSelectInput(session, inputId = 'imptMissVal', label = 'select column:',
                       choices = listMiss, selected = listMiss[1])
     
@@ -454,16 +456,18 @@ server <- shinyServer(function(input, output, session) {
     dat(dataUpdate)
   })
  
-
    observeEvent(input$normlz_p, {
     dataUpdate <- dat()
+    ft <- input$norm_p
+    dataUpdate[,ft] <- scale(dataUpdate[,ft])
+    
     dat(dataUpdate)
-    print(input$norm_p)
   })
    observeEvent(input$std_p, {
     dataUpdate <- dat()
-    dat(dataUpdate)
-    print(input$norm_p)
+    
+    #dat(dataUpdate)
+    #print(input$norm_p)
   })
   
   ## For Plotting
