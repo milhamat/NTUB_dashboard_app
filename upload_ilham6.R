@@ -457,17 +457,23 @@ server <- shinyServer(function(input, output, session) {
   })
  
    observeEvent(input$normlz_p, {
-    dataUpdate <- dat()
-    ft <- input$norm_p
-    dataUpdate[,ft] <- scale(dataUpdate[,ft])
-    
-    dat(dataUpdate)
+     dataUpdate <- dat()
+     ft <- input$norm_p
+     dataPoint <- dataUpdate[,ft]
+     
+     process <- preProcess(as.data.frame(dataPoint), method=c("range"))
+     norm_scale <- predict(process, as.data.frame(dataPoint))
+     
+     dataUpdate[,ft] <- norm_scale
+     
+     dat(dataUpdate)
   })
    observeEvent(input$std_p, {
-    dataUpdate <- dat()
-    
-    #dat(dataUpdate)
-    #print(input$norm_p)
+     dataUpdate <- dat()
+     ft <- input$norm_p
+     dataUpdate[,ft] <- scale(dataUpdate[,ft])
+     
+     dat(dataUpdate)
   })
   
   ## For Plotting
