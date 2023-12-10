@@ -51,6 +51,103 @@ ui <- shinyUI(fluidPage(
              )
     ),
     ###################################################################################################
+    tabPanel("Data Mining",
+             pageWithSidebar(h3("Filter"),
+                             sidebarPanel(
+                               selectInput(inputId = "fltr",
+                                           label = "Filter",
+                                           choices = ""),
+                               selectInput(inputId = "fltrBolean",
+                                           label = "Bolean",
+                                           choices = ""),
+                               textInput(inputId = "inpFilter",
+                                         label = "Value")
+                               ),
+                             mainPanel(
+                               #DT::dataTableOutput("Filter")
+                             )),
+             hr(),
+             #1
+             pageWithSidebar(h3("Select"),
+                             sidebarPanel(
+                               selectInput(inputId = "selCol",
+                                           label = "Select Cloumn",
+                                           choices = ""),
+                             ),
+                             mainPanel(
+                               #DT::dataTableOutput("Filter")
+                             )),
+             hr(),
+             #2
+             pageWithSidebar(h3("Arrange"),
+                             sidebarPanel(
+                               selectInput(inputId = "Argn",
+                                           label = "Arrange By",
+                                           choices = ""),
+                             ),
+                             mainPanel(
+                               #DT::dataTableOutput("Filter")
+                             )),
+             hr(),
+             #3
+             pageWithSidebar(h3("Mutated"),
+                             sidebarPanel(
+                               textInput(inputId = "mutName",
+                                         label = "Name :"),
+                               textInput(inputId = "mutFormula",
+                                         label = "Formula :")
+                             ),
+                             mainPanel(
+                               #DT::dataTableOutput("Filter")
+                             )),
+             hr(),
+             #4
+             pageWithSidebar(h3("Summarize"),
+                             sidebarPanel(
+                               textInput(inputId = "sumrzName",
+                                         label = "Name :"),
+                               selectInput(inputId = "fltr",
+                                           label = "Filter",
+                                           c("Maen"="smrMean",
+                                             "Median"="smrMedian",
+                                             "SD"="smrSD",
+                                             "IQR"="smrIqr",
+                                             "Min"="smrMin",
+                                             "Max"="smrMax",
+                                             "Quantile"="smrQnt",
+                                             "n"="smrN",
+                                             "any"="smrAny",
+                                             "All"="smrAll")),
+                             ),
+                             mainPanel(
+                               #DT::dataTableOutput("Filter")
+                             )),
+             hr(),
+             #5
+             pageWithSidebar(h3("Group-by"),
+                             sidebarPanel(
+                               textInput(inputId = "Grpby",
+                                         label = "Name :"),
+                             ),
+                             mainPanel(
+                               #DT::dataTableOutput("Filter")
+                             )),
+             hr(),
+             #6
+             pageWithSidebar(h3("Rename"),
+                             sidebarPanel(
+                               textInput(inputId = "RenameOld",
+                                         label = "Old Name :"),
+                               textInput(inputId = "RenameNew",
+                                         label = "New Name :")
+                             ),
+                             mainPanel(
+                               #DT::dataTableOutput("Filter")
+                             )),
+             hr(),
+             #7
+    ),
+    ###################################################################################################
     ## Tabs
     tabPanel("Data Preprocessing",
              titlePanel("Preprocess"),
