@@ -517,8 +517,11 @@ server <- shinyServer(function(input, output, session) {
 
   output$Filter <- DT::renderDataTable({
     datt <- dat()
+    dtPoint <- input$fltrCol
     tryCatch({
-      datt[input$fltrCol == input$inpFilter]
+      if (input$fltrBolean=="=="){
+        datt <- datt[datt[,dtPoint] == input$fltrVal,]
+      }
     })
     return(datt)
   })
