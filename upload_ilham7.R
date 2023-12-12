@@ -521,6 +521,12 @@ server <- shinyServer(function(input, output, session) {
     tryCatch({
       if (input$fltrBolean=="=="){
         datt <- datt[datt[,dtPoint] == input$fltrVal,]
+      } else if (input$fltrBolean=="!="){
+        datt <- datt[datt[,dtPoint] != input$fltrVal,]
+      } else if (input$fltrBolean==">"){
+        datt <- datt[datt[,dtPoint] > input$fltrVal,]
+      } else if (input$fltrBolean=="<"){
+        datt <- datt[datt[,dtPoint] < input$fltrVal,]
       }
     })
     return(datt)
