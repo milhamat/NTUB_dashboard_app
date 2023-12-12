@@ -3,7 +3,6 @@ library(datasets)
 library(ggplot2)
 library(dplyr)
 library(caret)
-library(tidyverse)
 ###################################################################################################
 ui <- shinyUI(fluidPage(
   ## Title
@@ -59,95 +58,93 @@ ui <- shinyUI(fluidPage(
                  fluidRow(column(4, selectInput("fltrCol", "Filter By:", c(""))),
                           column(4, selectInput("fltrBolean", "Boolean", c("==", "!=", ">", "<"))),
                           column(4, selectInput("fltrVal", "Value", c(""))
-                          # column(4, uiOutput("COL_VALUE"))
-                          #column(4, textInput(inputId = "inpFilter", label = "Value"))
-                          ))
-               ),
-               mainPanel(
-                 DT::dataTableOutput("Filter")
-               )),
-             hr(),
-             h3("Select"),
-             sidebarLayout(
-               sidebarPanel(
-                 selectInput(inputId = "selCol",
-                             label = "Select Cloumn",
-                             choices = ""),
-                             ),
+                          )
+                 )),
+                 mainPanel(
+                   DT::dataTableOutput("Filter")
+                 )),
+               hr(),
+               h3("Select"),
+               sidebarLayout(
+                 sidebarPanel(
+                   selectInput(inputId = "selCol",
+                               label = "Select Cloumn",
+                               choices = ""),
+                 ),
                  mainPanel(
                    DT::dataTableOutput("Select")
-                             )),
-             hr(),
-             h3("Arrange"),
-             sidebarLayout(
-               sidebarPanel(
-                 selectInput(inputId = "Argn",
-                             label = "Arrange By",
-                             choices = ""),
-                             ),
+                 )),
+               hr(),
+               h3("Arrange"),
+               sidebarLayout(
+                 sidebarPanel(
+                   selectInput(inputId = "Argn",
+                               label = "Arrange By",
+                               choices = ""),
+                 ),
                  mainPanel(
                    DT::dataTableOutput("Arrange")
-                             )),
-             hr(),
-             #3
-             h3("Mutate"),
-             sidebarLayout(
-               sidebarPanel(
-                 fluidRow(column(5, textInput(inputId = "mutName", label = "Name")),
-                          #column(4, textInput("mutpick", label=" ", value="=")),
-                          column(2,  p("=", style="text-align: center;")), #align="center",
-                          column(5, textInput(inputId = "mutForml", label = "Formula"))
-                          )
+                 )),
+               hr(),
+               #3
+               h3("Mutate"),
+               sidebarLayout(
+                 sidebarPanel(
+                   fluidRow(column(5, textInput(inputId = "mutName", label = "Name")),
+                            #column(4, textInput("mutpick", label=" ", value="=")),
+                            column(2,  p("=", style="text-align: center;")), #align="center",
+                            column(5, textInput(inputId = "mutForml", label = "Formula"))
+                   )
                  ),
-               mainPanel(
-                 DT::dataTableOutput("Mutate")
-               )),
-             hr(),
-             #3
-             h3("Summarise"),
-             sidebarLayout(
-               sidebarPanel(
-                 fluidRow(column(5, textInput(inputId = "sumVal", label = "Value")),
-                          column(2,  p("=", style="text-align: center;")),
-                          column(5, selectInput("COLUMN", "Filter By:",  c("Maen"="smrMean",
-                                                                            "Median"="smrMedian",
-                                                                            "SD"="smrSD",
-                                                                            "IQR"="smrIqr",
-                                                                            "Min"="smrMin",
-                                                                            "Max"="smrMax",
-                                                                            "Quantile"="smrQnt",
-                                                                            "n"="smrN",
-                                                                            "any"="smrAny",
-                                                                            "All"="smrAll")))
-                )),
-               mainPanel(
-                 DT::dataTableOutput("Summarise")
-               )),
-             hr(),
-             #5
-             h3("Group-by"),
-             sidebarLayout(
-               sidebarPanel(
-                 textInput(inputId = "Grpby",
-                           label = "Name :"),
-                             ),
-                             mainPanel(
-                               DT::dataTableOutput("Groupby")
-             )),
-             hr(),
-             #3
-             h3("Rename"),
-             sidebarLayout(
-               sidebarPanel(
-                 fluidRow(column(5, textInput(inputId = "olName", label = "Old Value")),
-                          column(2,  p("=", style="text-align: center;")),
-                          column(5, textInput(inputId = "nwName", label = "New Value"))
-                          )
+                 mainPanel(
+                   DT::dataTableOutput("Mutate")
+                 )),
+               hr(),
+               #3
+               h3("Summarise"),
+               sidebarLayout(
+                 sidebarPanel(
+                   fluidRow(column(5, textInput(inputId = "sumVal", label = "Value")),
+                            column(2,  p("=", style="text-align: center;")),
+                            column(5, selectInput("COLUMN", "Filter By:",  c("Maen"="smrMean",
+                                                                             "Median"="smrMedian",
+                                                                             "SD"="smrSD",
+                                                                             "IQR"="smrIqr",
+                                                                             "Min"="smrMin",
+                                                                             "Max"="smrMax",
+                                                                             "Quantile"="smrQnt",
+                                                                             "n"="smrN",
+                                                                             "any"="smrAny",
+                                                                             "All"="smrAll")))
+                   )),
+                 mainPanel(
+                   DT::dataTableOutput("Summarise")
+                 )),
+               hr(),
+               #5
+               h3("Group-by"),
+               sidebarLayout(
+                 sidebarPanel(
+                   textInput(inputId = "Grpby",
+                             label = "Name :"),
                  ),
-               mainPanel(
-                 DT::dataTableOutput("Rename")
-               )),
-    ),
+                 mainPanel(
+                   DT::dataTableOutput("Groupby")
+                 )),
+               hr(),
+               #3
+               h3("Rename"),
+               sidebarLayout(
+                 sidebarPanel(
+                   fluidRow(column(5, textInput(inputId = "olName", label = "Old Value")),
+                            column(2,  p("=", style="text-align: center;")),
+                            column(5, textInput(inputId = "nwName", label = "New Value"))
+                   )
+                 ),
+                 mainPanel(
+                   DT::dataTableOutput("Rename")
+                 )),
+             ),
     ###################################################################################################
     ## Tabs
     tabPanel("Data Preprocessing",
@@ -458,22 +455,6 @@ server <- shinyServer(function(input, output, session) {
     listMiss <- names(which(colSums(is.na(df))>0))
     updateSelectInput(session, inputId = 'imptMissVal', label = 'select column:',
                       choices = listMiss, selected = listMiss[1])
-
-    ####### Data Mining ####
-    updateSelectInput(session, inputId = 'fltrCol', label = 'Filter By:',
-                      choices = names(noChar), selected = names(noChar)[1])
-    updateSelectInput(session, inputId = 'selCol', label = 'Select Cloumn',
-                      choices = names(df), selected = names(df)[1])
-    updateSelectInput(session, inputId = 'Argn', label = 'Arrange By',
-                      choices = names(df), selected = names(df)[1])
-    
-    # x <- df %>% select(!!sym(input$fltrCol))
-    # # selectInput("VALUE", "Value", choices = x, selected = x[1])
-    # updateSelectInput(session, inputId = 'fltrVal', label = 'Value',
-    #                   choices = x, selected = x[1])
-    # updateSelectInput(session, inputId = 'Grpby', label = 'Name :',
-    #                   choices = names(df), selected = names(df)[1])
-    #######################
     
   })
   
@@ -501,79 +482,6 @@ server <- shinyServer(function(input, output, session) {
     })
     return(datt)
   })
-
-  ## DATA MINING #####
-
-  observeEvent(input$fltrCol, {
-    if(is.null(dat())){
-      return ()
-    }
-    datf <- dat()
-    x <- datf %>% select(!!sym(input$fltrCol))
-    # selectInput("VALUE", "Value", choices = x, selected = x[1])
-    updateSelectInput(session, inputId = 'fltrVal', label = 'Value',
-                      choices = x, selected = x[1])
-  })
-
-  output$Filter <- DT::renderDataTable({
-    datt <- dat()
-    tryCatch({
-      datt[input$fltrCol == input$inpFilter]
-    })
-    return(datt)
-  })
-
-  output$Select <- DT::renderDataTable({
-      datt <- dat()
-      tryCatch({
-        datt
-      })
-      return(datt)
-    })
-
-    output$Arrange <- DT::renderDataTable({
-    datt <- dat()
-    tryCatch({
-      datt
-    })
-    return(datt)
-  })
-
-    output$Mutate <- DT::renderDataTable({
-    datt <- dat()
-    tryCatch({
-      datt
-    })
-    return(datt)
-  })
-
-  output$Summarise <- DT::renderDataTable({
-    datt <- dat()
-    tryCatch({
-      datt
-    })
-    return(datt)
-  })
-
-    output$Groupby <- DT::renderDataTable({
-    datt <- dat()
-    tryCatch({
-      datt
-    })
-    return(datt)
-  })
-
-  output$Rename <- DT::renderDataTable({
-    datt <- dat()
-    tryCatch({
-      datt
-    })
-    return(datt)
-  })
-
-
-  #################### 
-
   ### Impute Missing Value
   observeEvent(input$rmv, {
     dataUpdate <- dat()

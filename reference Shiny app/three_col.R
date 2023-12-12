@@ -27,6 +27,7 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   output$COL_VALUE <- renderUI({
+    # data reading
     x <- iris %>% select(!!sym(input$COLUMN))
     selectInput("VALUE", "Value", choices = x, selected = x[1])
   })
@@ -38,7 +39,6 @@ server <- function(input, output) {
   output$as_text <- renderText({
     filtering_string()
   })
-  
   
   output$the_data <- renderTable({
     eval(parse(text = filtering_string()))
