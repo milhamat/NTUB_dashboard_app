@@ -534,10 +534,8 @@ server <- shinyServer(function(input, output, session) {
 
   output$Select <- DT::renderDataTable({
       datt <- dat()
-      tryCatch({
-        datt
-      })
-      return(datt)
+      dtPoint <- input$selCol
+      DT::datatable(datt[, dtPoint, drop = FALSE])
     })
 
     output$Arrange <- DT::renderDataTable({
