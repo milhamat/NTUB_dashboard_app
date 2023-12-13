@@ -97,7 +97,9 @@ ui <- shinyUI(fluidPage(
                           #column(4, textInput("mutpick", label=" ", value="=")),
                           column(2,  p("=", style="text-align: center;")), #align="center",
                           column(5, textInput(inputId = "mutForml", label = "Formula"))
-                          )
+                          ),
+                 actionButton("mutApply", "Apply Mutate",
+                                         class="btn-block"),
                  ),
                mainPanel(
                  DT::dataTableOutput("Mutate")
@@ -107,21 +109,19 @@ ui <- shinyUI(fluidPage(
              h3("Summarise"),
              sidebarLayout(
                sidebarPanel(
-                 fluidRow(column(5, textInput(inputId = "sumVal", label = "Value")),
+                 fluidRow(column(5, selectInput(inputId = "sumVal", label = "Value", c(""))),
                           column(2,  p("=", style="text-align: center;")),
-                          column(5, selectInput("COLUMN", "Filter By:",  c("Maen"="smrMean",
+                          column(5, selectInput("sumFunc", "Filter By:",  c("Maen"="smrMean",
                                                                             "Median"="smrMedian",
                                                                             "SD"="smrSD",
                                                                             "IQR"="smrIqr",
                                                                             "Min"="smrMin",
                                                                             "Max"="smrMax",
-                                                                            "Quantile"="smrQnt",
-                                                                            "n"="smrN",
-                                                                            "any"="smrAny",
                                                                             "All"="smrAll")))
                 )),
                mainPanel(
-                 DT::dataTableOutput("Summarise")
+                 #DT::dataTableOutput("Summarise")
+                 verbatimTextOutput("Summarise")
                )),
              hr(),
              #5
@@ -142,7 +142,9 @@ ui <- shinyUI(fluidPage(
                  fluidRow(column(5, textInput(inputId = "olName", label = "Old Value")),
                           column(2,  p("=", style="text-align: center;")),
                           column(5, textInput(inputId = "nwName", label = "New Value"))
-                          )
+                          ),
+                 actionButton("rnmApply", "Apply Change",
+                              class="btn-block"),
                  ),
                mainPanel(
                  DT::dataTableOutput("Rename")
@@ -466,6 +468,8 @@ server <- shinyServer(function(input, output, session) {
                       choices = names(df), selected = names(df)[1])
     updateSelectInput(session, inputId = 'Argn', label = 'Arrange By',
                       choices = names(df), selected = names(df)[1])
+    updateSelectInput(session, inputId = 'sumVal', label = 'Value',
+                      choices = names(noChar), selected = names(noChar)[1])
     
     # x <- df %>% select(!!sym(input$fltrCol))
     # # selectInput("VALUE", "Value", choices = x, selected = x[1])
@@ -538,26 +542,58 @@ server <- shinyServer(function(input, output, session) {
       DT::datatable(datt[, dtPoint, drop = FALSE])
     })
 
-    output$Arrange <- DT::renderDataTable({
+  output$Arrange <- DT::renderDataTable({
+    if(is.null(dat())){
+      return ()
+    }
     datt <- dat()
     dtPoint <- input$Argn
     DT::datatable(datt %>% arrange(datt[,dtPoint]))
   })
-
-    output$Mutate <- DT::renderDataTable({
+  
+  observeEvent(input$mutApply,{ #HERE
+    #strg <- paste(input$mutName,' ',input$mutForml)
+    #print(strg)
     datt <- dat()
-    tryCatch({
-      datt
-    })
-    return(datt)
+    colnam <- input$mutName
+    forml <- input$mutForml
+    
+    datUpdate <- mutate(datt, colnam = forml)
+    print(datUpdate)
+    #dat[colnam] <- datUpdate[-1]
+    #DT::datatable(datUpdate)
   })
+  
+  #output$Mutate <- DT::renderDataTable({
+    #datt <- dat()
+    
+    #datUpdate <- mutate(datt, input$mutName = input$mutForml)
+    #DT::datatable(datt)
+    
+  #})
 
-  output$Summarise <- DT::renderDataTable({
+  output$Summarise <- renderPrint({
     datt <- dat()
-    tryCatch({
-      datt
-    })
-    return(datt)
+    datt <- na.omit(datt)
+    #tryCatch({
+    if (input$sumFunc=='smrMean'){
+      datt %>% summarise_at(input$sumVal, mean)
+    } else if (input$sumFunc=='smrMedian') {
+      datt %>% summarise_at(input$sumVal, median)
+    } else if (input$sumFunc=='smrSD') {
+      datt %>% summarise_at(input$sumVal, sd)
+    } else if (input$sumFunc=='smrIqr') {
+      datt %>% summarise_at(input$sumVal, IQR)
+    } else if (input$sumFunc=='smrMin') {
+      datt %>% summarise_at(input$sumVal, min)
+    } else if (input$sumFunc=='smrMax') {
+      datt %>% summarise_at(input$sumVal, max)
+    } else if (input$sumFunc=='smrAll') {
+      dtpoint <- input$sumVal
+      summary(datt[,dtpoint])
+    }
+    #})
+    # return(datt)
   })
 
     output$Groupby <- DT::renderDataTable({
@@ -567,13 +603,24 @@ server <- shinyServer(function(input, output, session) {
     })
     return(datt)
   })
-
-  output$Rename <- DT::renderDataTable({
+  
+  observeEvent(input$rnmApply, { #HERE
     datt <- dat()
-    tryCatch({
-      datt
-    })
-    return(datt)
+    ol <- input$olName
+    nw <- input$nwName
+    
+    datUpd <- rename(datt, nw = ol)
+    print(datUpd)
+    #dat(datt)
+  })
+    
+  output$Rename <- DT::renderDataTable({ 
+    datt <- dat()
+    #ol <- input$olName
+    #nw <- input$nwName
+    
+    #rename(datt, ol = nw)
+    DT::datatable(datt)
   })
 
 
