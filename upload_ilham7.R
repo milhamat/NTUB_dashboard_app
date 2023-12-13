@@ -540,10 +540,8 @@ server <- shinyServer(function(input, output, session) {
 
     output$Arrange <- DT::renderDataTable({
     datt <- dat()
-    tryCatch({
-      datt
-    })
-    return(datt)
+    dtPoint <- input$Argn
+    DT::datatable(datt %>% arrange(datt[,dtPoint]))
   })
 
     output$Mutate <- DT::renderDataTable({
