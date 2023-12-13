@@ -31,6 +31,16 @@ auto_
 auto2 <- mutate(mpg, 'hp_to_weight' = 'year' / 'cyl')
 auto2
 
+MPG = "mpg"
+YEAR = "year"
+CYL = "cyl"
+
+tt = paste0(MPG, "%>% mutate(tf =", YEAR, "/", CYL, ")")
+
+eval(parse(text = tt))
+
+dd <- eval(parse(text = tt))
+
 ### Summarise
 data <- na.omit(data)
 data %>% summarise_at('mxPH', mean)
@@ -41,7 +51,8 @@ data %>% summarise_at('mxPH', sd)
 data %>% summarise_at('mxPH', IQR)
 summary(data$mxPH)
 ### Group-by
-
+data %>% group_by(data[,"mxPH"])
+data
 ### Rename
 colnames(data)
 rename(data, "SIZE" = "size")

@@ -50,6 +50,7 @@ server <- function(input, output) {
   
   observeEvent(input$show_vars,{
     print(input$show_vars)
+    print(typeof(input$show_vars))
   })
   
 }

@@ -2,6 +2,7 @@ library(shiny)
 library(datasets)
 library(ggplot2)
 library(dplyr)
+library(ISLR)
 library(caret)
 library(tidyverse)
 ###################################################################################################
@@ -70,9 +71,15 @@ ui <- shinyUI(fluidPage(
              h3("Select"),
              sidebarLayout(
                sidebarPanel(
-                 selectInput(inputId = "selCol",
+                selectInput(inputId = "selCol",
                              label = "Select Cloumn",
-                             choices = ""),
+                             c(""),
+                             ),
+                #  varSelectInput(inputId = "selCol",
+                #              label = "Select Cloumn",
+                #              c(""),
+                #              multiple = TRUE
+                #              ),
                              ),
                  mainPanel(
                    DT::dataTableOutput("Select")
@@ -128,8 +135,9 @@ ui <- shinyUI(fluidPage(
              h3("Group-by"),
              sidebarLayout(
                sidebarPanel(
-                 textInput(inputId = "Grpby",
-                           label = "Name :"),
+                 selectInput(inputId = "Grpby", #textInput
+                             label = "Name :",
+                             c("")),
                              ),
                              mainPanel(
                                DT::dataTableOutput("Groupby")
@@ -139,7 +147,7 @@ ui <- shinyUI(fluidPage(
              h3("Rename"),
              sidebarLayout(
                sidebarPanel(
-                 fluidRow(column(5, textInput(inputId = "olName", label = "Old Value")),
+                 fluidRow(column(5, selectInput(inputId = "olName", label = "Old Value", c(""))),
                           column(2,  p("=", style="text-align: center;")),
                           column(5, textInput(inputId = "nwName", label = "New Value"))
                           ),
@@ -211,6 +219,24 @@ ui <- shinyUI(fluidPage(
                    verbatimTextOutput("datainfo")
         )
       )
+    ),
+    ###################################################################################################
+    ## Tabs
+    tabPanel("Statistical Test",
+             titlePanel("ANOVA"),
+             sidebarLayout(
+              sidebarPanel(
+                selectInput(inputId = "anovaY",
+                            label = "Dependent Variable :",
+                            c("")),
+                selectInput(inputId = "anovaX",
+                            label = "Independent Variable :",
+                            c("")),
+              ),
+              mainPanel(
+                verbatimTextOutput("ANOVArslt")
+            )
+        )
     ),
     ###################################################################################################
     tabPanel("Data Visualization", ## First Type
@@ -470,15 +496,18 @@ server <- shinyServer(function(input, output, session) {
                       choices = names(df), selected = names(df)[1])
     updateSelectInput(session, inputId = 'sumVal', label = 'Value',
                       choices = names(noChar), selected = names(noChar)[1])
-    
-    # x <- df %>% select(!!sym(input$fltrCol))
-    # # selectInput("VALUE", "Value", choices = x, selected = x[1])
-    # updateSelectInput(session, inputId = 'fltrVal', label = 'Value',
-    #                   choices = x, selected = x[1])
-    # updateSelectInput(session, inputId = 'Grpby', label = 'Name :',
-    #                   choices = names(df), selected = names(df)[1])
-    #######################
-    
+    updateSelectInput(session, inputId = 'Grpby', label = 'Name :',
+                      choices = names(df), selected = names(df)[1])                
+    updateSelectInput(session, inputId = 'olName', label = 'Old Value',
+                      choices = names(df), selected = names(df)[1])
+    updateSelectInput(session, inputId = 'anovaY', label = 'Dependent Variable :',
+                      choices = names(noChar), selected = names(noChar)[1])
+    updateSelectInput(session, inputId = 'anovaX', label = 'Independent Variable :',
+                      choices = names(noChar), selected = names(noChar)[1])
+  })
+  
+  mtydat <- reactive({
+    return(dat())
   })
   
   ## Showing Raw Data Summary
@@ -506,19 +535,34 @@ server <- shinyServer(function(input, output, session) {
     return(datt)
   })
 
+  ### Statistical Test ###
+  output$ANOVArslt <- renderPrint({
+    if(is.null(dat())){
+      return ()
+      }
+      datt <- dat()
+      aov.model <- aov(datt[[input$anovaY]] ~ datt[,input$anovaX], data = datt) # Stuck here
+      #print(aov.model)
+      br()
+      print(summary(aov.model))
+      br()
+      # cat("Coefficients"); cat("\n")
+      print(aov.model$coefficients)
+  })
+  ########################
   ## DATA MINING #####
 
+  ### FILTER ###
   observeEvent(input$fltrCol, {
     if(is.null(dat())){
       return ()
     }
     datf <- dat()
     x <- datf %>% select(!!sym(input$fltrCol))
-    # selectInput("VALUE", "Value", choices = x, selected = x[1])
     updateSelectInput(session, inputId = 'fltrVal', label = 'Value',
                       choices = x, selected = x[1])
   })
-
+  
   output$Filter <- DT::renderDataTable({
     datt <- dat()
     dtPoint <- input$fltrCol
@@ -535,13 +579,16 @@ server <- shinyServer(function(input, output, session) {
     })
     return(datt)
   })
-
+  ### FILTER ###
+  ### SELECT ###
   output$Select <- DT::renderDataTable({
       datt <- dat()
       dtPoint <- input$selCol
+      
       DT::datatable(datt[, dtPoint, drop = FALSE])
     })
-
+  ### SELECT ###
+  ### ARRANGE ###
   output$Arrange <- DT::renderDataTable({
     if(is.null(dat())){
       return ()
@@ -550,29 +597,24 @@ server <- shinyServer(function(input, output, session) {
     dtPoint <- input$Argn
     DT::datatable(datt %>% arrange(datt[,dtPoint]))
   })
-  
+  ### ARRANGE ###
+  ####MUTATE ####
   observeEvent(input$mutApply,{ #HERE
-    #strg <- paste(input$mutName,' ',input$mutForml)
-    #print(strg)
     datt <- dat()
     colnam <- input$mutName
     forml <- input$mutForml
     
-    datUpdate <- mutate(datt, colnam = forml)
-    print(datUpdate)
-    #dat[colnam] <- datUpdate[-1]
-    #DT::datatable(datUpdate)
+    output$Mutate <- DT::renderDataTable({ 
+      datUpdate <- mutate(datt, colnam = forml)
+      DT::datatable(datUpdate)
+    })
   })
-  
-  #output$Mutate <- DT::renderDataTable({
-    #datt <- dat()
-    
-    #datUpdate <- mutate(datt, input$mutName = input$mutForml)
-    #DT::datatable(datt)
-    
-  #})
-
+  ####MUTATE ####
+  ### SUMMARISE ###
   output$Summarise <- renderPrint({
+    if(is.null(dat())){
+      return ()
+    }
     datt <- dat()
     datt <- na.omit(datt)
     #tryCatch({
@@ -595,34 +637,32 @@ server <- shinyServer(function(input, output, session) {
     #})
     # return(datt)
   })
-
-    output$Groupby <- DT::renderDataTable({
+  ### SUMMARISE ###
+  ####GROUP BY ####
+  output$Groupby <- DT::renderDataTable({
+    if(is.null(dat())){
+      return ()
+    }
     datt <- dat()
-    tryCatch({
-      datt
-    })
-    return(datt)
+    dtPoint <- input$Grpby
+    datt %>% group_by(datt[,dtPoint])
   })
-  
+  ####GROUP BY ####
+  #### RENAME ####
   observeEvent(input$rnmApply, { #HERE
     datt <- dat()
     ol <- input$olName
     nw <- input$nwName
     
     datUpd <- rename(datt, nw = ol)
-    print(datUpd)
-    #dat(datt)
-  })
-    
-  output$Rename <- DT::renderDataTable({ 
-    datt <- dat()
-    #ol <- input$olName
-    #nw <- input$nwName
-    
-    #rename(datt, ol = nw)
-    DT::datatable(datt)
-  })
+    # print(datUpd)
 
+    output$Rename <- DT::renderDataTable({ 
+
+      DT::datatable(datUpd)
+    })
+  })
+  #### RENAME ####
 
   #################### 
 

@@ -116,6 +116,10 @@ server <- function(input, output) {
                    multiple = TRUE) 
   })
   
+  observeEvent(input$variable_merge,{
+    print(input$variable_merge)
+  })
+  
   
   outputmergetemp <- reactive({   
     req(input$combine_columns)
