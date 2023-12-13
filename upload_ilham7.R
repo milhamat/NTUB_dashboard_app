@@ -120,7 +120,8 @@ ui <- shinyUI(fluidPage(
                           column(2,  p("=", style="text-align: center;")),
                           column(5, selectInput("sumFunc", "Filter By:",  c("Maen"="smrMean",
                                                                             "Median"="smrMedian",
-                                                                            "Variance"="smrVar"
+                                                                            "Variance"="smrVar",
+                                                                            "Numbers"="smrNum",
                                                                             "SD"="smrSD",
                                                                             "IQR"="smrIqr",
                                                                             "Min"="smrMin",
@@ -625,6 +626,8 @@ server <- shinyServer(function(input, output, session) {
       datt %>% summarise_at(input$sumVal, median)
     } else if (input$sumFunc=='smrVar') {
       datt %>% summarise_at(input$sumVal, var)
+    } else if (input$sumFunc=='smrNum') {
+      datt %>% summarise_at(input$sumVal, length)
     } else if (input$sumFunc=='smrSD') {
       datt %>% summarise_at(input$sumVal, sd)
     } else if (input$sumFunc=='smrIqr') {

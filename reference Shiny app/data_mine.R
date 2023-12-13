@@ -49,6 +49,8 @@ data %>% summarise_at('mxPH', min)
 data %>% summarise_at('mxPH', max)
 data %>% summarise_at('mxPH', sd)
 data %>% summarise_at('mxPH', IQR)
+data %>% summarise_at('mxPH', var) #length
+data %>% summarise_at('mxPH', length)
 summary(data$mxPH)
 ### Group-by
 data %>% group_by(data[,"mxPH"])
