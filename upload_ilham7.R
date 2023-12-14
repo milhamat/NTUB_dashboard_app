@@ -225,21 +225,97 @@ ui <- shinyUI(fluidPage(
     ###################################################################################################
     ## Tabs
     tabPanel("Statistical Test",
-             titlePanel("ANOVA"),
+             #titlePanel("ANOVA"),
+             h3("ANOVA"),
              sidebarLayout(
               sidebarPanel(
-                selectInput(inputId = "anovaY",
-                            label = "Dependent Variable :",
-                            c("")),
                 selectInput(inputId = "anovaX",
-                            label = "Independent Variable :",
+                            label = "Dependent Variable (X) :",
+                            c("")),
+                selectInput(inputId = "anovaY",
+                            label = "Independent Variable (Y) :",
                             c("")),
               ),
               mainPanel(
                 verbatimTextOutput("ANOVArslt")
             )
-        )
+        ), #<----- here
+              h3("T-test"),
+              sidebarLayout(
+                sidebarPanel(
+                  selectInput(inputId = "ttestX",
+                              label = "(X) :",
+                              c("")),
+                  selectInput(inputId = "ttestY",
+                              label = "(Y) :",
+                              c("")),
+                ),
+                mainPanel(
+                  verbatimTextOutput("ttestRslt")
+                )
+        ), #<----- here
+                h3("U-test"),
+                sidebarLayout(
+                  sidebarPanel(
+                    selectInput(inputId = "utestX",
+                                label = "(X) :",
+                                c("")),
+                    selectInput(inputId = "utestY",
+                                label = "(Y) :",
+                                c("")),
+                  ),
+                  mainPanel(
+                    verbatimTextOutput("utestRslt")
+                  )
+        ), #<----- here
+                h3("Paired test"),
+                sidebarLayout(
+                  sidebarPanel(
+                    selectInput(inputId = "PtestX",
+                                label = "(X) :",
+                                c("")),
+                    selectInput(inputId = "PtestY",
+                                label = "(Y) :",
+                                c("")),
+                  ),
+                  mainPanel(
+                    verbatimTextOutput("ptRslt")
+                  )
+        ), #<----- here
+                h3("Chi Squared tests"),
+                sidebarLayout(
+                  sidebarPanel(
+                    selectInput(inputId = "cstestX",
+                                label = "(X) :",
+                                c("")),
+                    selectInput(inputId = "cstestY",
+                                label = "(Y) :",
+                                c("")),
+                  ),
+                  mainPanel(
+                    verbatimTextOutput("cstestRslt")
+                  )
+        ), #<----- here
+              h3("Goodness of Fit test"),
+              sidebarLayout(
+                sidebarPanel(
+                  selectInput(inputId = "gftestX",
+                              label = "(X) :",
+                              c("")),
+                  selectInput(inputId = "gftestY",
+                              label = "(Y) :",
+                              c("")),
+                ),
+                mainPanel(
+                  verbatimTextOutput("gftRslt")
+                )
+        ), #<----- here
     ),
+    # 1.T-test
+    # 2.U-test
+    # 3.Paired tests
+    # 4.Chi Squared tests
+    # 5.Goodness of Fit test
     ###################################################################################################
     tabPanel("Data Visualization", ## First Type
              pageWithSidebar(
@@ -435,7 +511,7 @@ ui <- shinyUI(fluidPage(
                     )
                   ),
                 tags$br(),
-                tags$p(strong("Download Plot as png"))#,
+                #tags$p(strong("Download Plot as png"))#,
                 # downloadButton("savePlot", "Save Plot")
                ),
                ################
@@ -502,10 +578,37 @@ server <- shinyServer(function(input, output, session) {
                       choices = names(df), selected = names(df)[1])                
     updateSelectInput(session, inputId = 'olName', label = 'Old Value',
                       choices = names(df), selected = names(df)[1])
-    updateSelectInput(session, inputId = 'anovaY', label = 'Dependent Variable :',
+    ## STATISTICAL TEST
+    updateSelectInput(session, inputId = 'anovaY', label = 'Dependent Variable (X) :',
                       choices = names(noChar), selected = names(noChar)[1])
-    updateSelectInput(session, inputId = 'anovaX', label = 'Independent Variable :',
+    updateSelectInput(session, inputId = 'anovaX', label = 'Independent Variable (Y) :',
                       choices = names(noChar), selected = names(noChar)[1])
+
+    updateSelectInput(session, inputId = 'ttestY', label = '(Y) :',
+                      choices = names(noChar), selected = names(noChar)[1])
+    updateSelectInput(session, inputId = 'ttestX', label = '(X) :',
+                      choices = names(noChar), selected = names(noChar)[1])
+
+    updateSelectInput(session, inputId = 'utestY', label = '(Y) :',
+                      choices = names(noChar), selected = names(noChar)[1])
+    updateSelectInput(session, inputId = 'utestX', label = '(X) :',
+                      choices = names(noChar), selected = names(noChar)[1])
+
+    updateSelectInput(session, inputId = 'PtestY', label = '(Y) :',
+                      choices = names(noChar), selected = names(noChar)[1])
+    updateSelectInput(session, inputId = 'PtestX', label = '(X) :',
+                      choices = names(noChar), selected = names(noChar)[1])
+
+   updateSelectInput(session, inputId = 'cstestY', label = '(Y) :',
+                      choices = names(noChar), selected = names(noChar)[1])
+   updateSelectInput(session, inputId = 'cstestX', label = '(X) :',
+                      choices = names(noChar), selected = names(noChar)[1])
+
+   updateSelectInput(session, inputId = 'gftestY', label = '(Y) :',
+                      choices = names(noChar), selected = names(noChar)[1])
+   updateSelectInput(session, inputId = 'gftestX', label = '(X) :',
+                      choices = names(noChar), selected = names(noChar)[1])
+
   })
   
   mtydat <- reactive({
@@ -550,6 +653,71 @@ server <- shinyServer(function(input, output, session) {
       br()
       # cat("Coefficients"); cat("\n")
       print(aov.model$coefficients)
+  })
+
+  output$ttestRslt <- renderPrint({
+    if(is.null(dat())){
+      return ()
+      }
+    datt <- dat()
+    x <- input$ttestX
+    y <- input$ttestY
+    t.test(datt[,x], datt[,y])
+  })
+
+  output$utestRslt <- renderPrint({
+    if(is.null(dat())){
+      return ()
+      }
+    datt <- dat()
+    x <- input$utestX
+    y <- input$utestY
+    wilcox.test(datt[,x], datt[,y])
+  })
+
+  output$ptRslt <- renderPrint({
+    if(is.null(dat())){
+      return ()
+      }
+    datt <- dat()
+    x <- input$PtestX
+    y <- input$PtestY
+    t.test(datt[,x], datt[,y], paired = TRUE, var.equal = TRUE) 
+  })
+
+  output$cstestRslt <- renderPrint({
+    if(is.null(dat())){
+      return ()
+      }
+    datt <- dat()
+    data <- datt[, !sapply(datt, is.character)]
+    
+    x <- input$cstestX
+    y <- input$cstestY
+    csTwo <- chisq.test(datt[,x], datt[,y])
+    print(csTwo)
+    print("ALL Columns")
+    csAll <- chisq.test(nochar)
+    csAll
+  
+    # cs[,x]
+  })
+
+  output$gftRslt <- renderPrint({
+    if(is.null(dat())){
+      return ()
+      }
+    datt <- dat()
+    data <- datt[, !sapply(datt, is.character)]
+    
+    x <- input$gftestX
+    y <- input$gftestY
+    gfitTwo <- chisq.test(datt[,x], datt[,y], p = ratio, rescale.p = TRUE)
+    print(gfitTwo)
+    print("ALL Columns")
+    gfitAll <- chisq.test(nochar, p = ratio, rescale.p = TRUE)
+    gfitAll
+    # gfit[,x]
   })
   ########################
   ## DATA MINING #####
