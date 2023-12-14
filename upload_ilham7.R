@@ -697,7 +697,7 @@ server <- shinyServer(function(input, output, session) {
     csTwo <- chisq.test(datt[,x], datt[,y])
     print(csTwo)
     print("ALL Columns")
-    csAll <- chisq.test(nochar)
+    csAll <- chisq.test(data)
     csAll
   
     # cs[,x]
@@ -715,7 +715,7 @@ server <- shinyServer(function(input, output, session) {
     gfitTwo <- chisq.test(datt[,x], datt[,y], p = ratio, rescale.p = TRUE)
     print(gfitTwo)
     print("ALL Columns")
-    gfitAll <- chisq.test(nochar, p = ratio, rescale.p = TRUE)
+    gfitAll <- chisq.test(data, p = ratio, rescale.p = TRUE)
     gfitAll
     # gfit[,x]
   })
