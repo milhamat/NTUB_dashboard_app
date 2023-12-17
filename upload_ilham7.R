@@ -774,8 +774,12 @@ server <- shinyServer(function(input, output, session) {
     colnam <- input$mutName
     forml <- input$mutForml
     
+    DATT <- "datt"
+    COLNAM <- "colnam"
+    FORML <- "forml"
+    
     output$Mutate <- DT::renderDataTable({ 
-      datUpdate <- mutate(datt, colnam = forml)
+      datUpdate <- eval(parse(text = paste0(DATT, "%>% mutate(", eval(parse(text = COLNAM)), "=", eval(parse(text = FORML)),")")))
       DT::datatable(datUpdate)
     })
   })
@@ -819,6 +823,7 @@ server <- shinyServer(function(input, output, session) {
     }
     datt <- dat()
     dtPoint <- input$Grpby
+    
     datt %>% group_by(datt[,dtPoint])
   })
   ####GROUP BY ####
@@ -828,11 +833,16 @@ server <- shinyServer(function(input, output, session) {
     ol <- input$olName
     nw <- input$nwName
     
-    datUpd <- rename(datt, nw = ol)
+    DATT <- "datt"
+    OL <- "ol"
+    NW <- "nw"
+    
+    
+    #datUpd <- rename(datt, nw = ol)
     # print(datUpd)
 
     output$Rename <- DT::renderDataTable({ 
-
+      datUpd <- eval(parse(text = paste0(DATT, "%>% rename(", eval(parse(text = NW) ), "=", eval(parse(text = OL)),")")))
       DT::datatable(datUpd)
     })
   })
