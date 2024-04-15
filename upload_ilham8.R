@@ -538,11 +538,26 @@ server <- shinyServer(function(input, output, session) {
     list(input$file1, input$header, input$sep, input$quote)
   })
 
+  # observeEvent(datainlist(), ignoreNULL=T, ignoreInit=T, {
+  #   inFile <- input$file1
+  #   dx <- read.csv(inFile$datapath, 
+  #                  header = input$header, 
+  #                  sep = input$sep,
+  #                  quote = input$quote)
+  #   # write the dataset
+  #   readr::write_csv(dx, "originalData.csv")
+  # })
+
   observeEvent(datainlist(), ignoreNULL=T, ignoreInit=T, {
-    
-    inFile <- input$file1
-    df <- read.csv(inFile$datapath, header = input$header, sep = input$sep,
+  # observeEvent({
+    # inFile <- input$file1
+    data <- read.csv(inFile$datapath, header = input$header, sep = input$sep,
                     quote = input$quote)
+    # save the datset
+    readr::write_csv(data, "originalData.csv")
+    # read the dataset
+    df <- read.csv("originalData.csv")
+    
     dat(df)
     OriginalData(df)
     # For updating the x and y axis feature 
@@ -599,15 +614,16 @@ server <- shinyServer(function(input, output, session) {
     updateSelectInput(session, inputId = 'PtestX', label = '(X) :',
                       choices = names(noChar), selected = names(noChar)[1])
 
-   updateSelectInput(session, inputId = 'cstestY', label = '(Y) :',
+    updateSelectInput(session, inputId = 'cstestY', label = '(Y) :',
                       choices = names(noChar), selected = names(noChar)[1])
-   updateSelectInput(session, inputId = 'cstestX', label = '(X) :',
+    updateSelectInput(session, inputId = 'cstestX', label = '(X) :',
                       choices = names(noChar), selected = names(noChar)[1])
 
-   updateSelectInput(session, inputId = 'gftestY', label = '(Y) :',
+    updateSelectInput(session, inputId = 'gftestY', label = '(Y) :',
                       choices = names(noChar), selected = names(noChar)[1])
-   updateSelectInput(session, inputId = 'gftestX', label = '(X) :',
+    updateSelectInput(session, inputId = 'gftestX', label = '(X) :',
                       choices = names(noChar), selected = names(noChar)[1])
+    
 
   })
   
