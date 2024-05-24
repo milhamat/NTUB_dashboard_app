@@ -580,9 +580,9 @@ server <- shinyServer(function(input, output, session) {
     updateSelectInput(session, inputId = 'olName', label = 'Old Value',
                       choices = names(df), selected = names(df)[1])
     ## STATISTICAL TEST
-    updateSelectInput(session, inputId = 'anovaY', label = 'Dependent Variable (X) :',
+    updateSelectInput(session, inputId = 'anovaX', label = 'Dependent Variable (X) :',
                       choices = names(noChar), selected = names(noChar)[1])
-    updateSelectInput(session, inputId = 'anovaX', label = 'Independent Variable (Y) :',
+    updateSelectInput(session, inputId = 'anovaY', label = 'Independent Variable (Y) :',
                       choices = names(noChar), selected = names(noChar)[1])
     
     updateSelectInput(session, inputId = 'ttestY', label = '(Y) :',
